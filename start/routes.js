@@ -16,6 +16,10 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+Route.post('/users', 'UserController.store')
+Route.post('/authenticate', 'SessionController.authenticate')
+Route.post('/users/:id/avatar', 'ImageController.store')
+Route.get('images/:path', 'ImageController.show')
+
+Route.resource('users', 'UserController')
+  .apiOnly().except(['store']).middleware('auth')
