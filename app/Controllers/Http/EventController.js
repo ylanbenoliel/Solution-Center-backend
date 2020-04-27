@@ -1,4 +1,5 @@
 'use strict'
+const Database = use('Database')
 const Event = use('App/Models/Event')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -20,11 +21,11 @@ class EventController {
   async index ({ request, response }) {
     try {
       const { date } = request.all()
-      const events = await Event.query()
-        .select('id', 'user_id', 'room', 'date', 'time')
+      const events = Database
+        .select('events.id', 'users.name', 'events.room', 'events.date', 'events.time')
+        .from('events')
+        .innerJoin('users', 'users.id', 'events.user_id')
         .where({ date })
-        .fetch()
-
       return events
     } catch (error) {
       return response
@@ -55,7 +56,9 @@ class EventController {
       }
 
       const newEvent = await Event.create(data)
-      return newEvent
+      return response.status(200).send(
+        { message: 'Horário salvo!', event: newEvent }
+      )
     } catch (error) {
       return response
         .status(error.status)
@@ -136,6 +139,8 @@ class EventController {
           id: eventID,
           user_id: userID
         }).delete()
+
+      return response.status(200).send({ message: 'Horário desmarcado' })
     } catch (error) {
       return response
         .status(error.status)
