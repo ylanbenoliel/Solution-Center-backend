@@ -38,6 +38,10 @@ class User extends Model {
   events () {
     return this.hasMany('App/Models/Event')
   }
+
+  notification () {
+    return this.hasOne('App/Models/Notification')
+  }
 }
 
 module.exports = User

@@ -30,3 +30,10 @@ Route.group(() => {
   Route.get('/events/list/user', 'EventController.show')
   Route.delete('/events/:id', 'EventController.destroy')
 }).middleware('auth')
+
+Route.post('/notification/register', 'NotificationController.store')
+
+Route.group(() => {
+  Route.get('/notification/list', 'NotificationController.index')
+  Route.put('/notification/update', 'NotificationController.update')
+}).middleware('auth')
