@@ -22,4 +22,11 @@ Route.post('/users/:id/avatar', 'ImageController.store')
 Route.get('images/:path', 'ImageController.show')
 
 Route.resource('users', 'UserController')
-  .apiOnly().except(['store']).middleware('auth')
+  .apiOnly().except(['store', 'destroy']).middleware('auth')
+
+Route.group(() => {
+  Route.post('/events/new', 'EventController.store')
+  Route.get('/events/list', 'EventController.index')
+  Route.get('/events/list/user', 'EventController.show')
+  Route.delete('/events/:id', 'EventController.destroy')
+}).middleware('auth')
