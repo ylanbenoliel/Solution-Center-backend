@@ -37,3 +37,8 @@ Route.group(() => {
   Route.get('/notification/list', 'NotificationController.index')
   Route.put('/notification/update', 'NotificationController.update')
 }).middleware('auth')
+
+Route.group(() => {
+  Route.get('/dates', 'DateController.index')
+}
+).middleware('auth')
