@@ -14,6 +14,12 @@ class DateController {
     const minDate = format(currentDate, 'yyyy-MM-dd')
     let maxDate = {}
     let saturday = {}
+    let hours = []
+    if (isSaturday(currentDate)) {
+      hours = ['08', '09', '10', '11', '12', '13']
+    } else {
+      hours = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
+    }
     if (isFriday(currentDate) || isSaturday(currentDate)) {
       const nextWeek = addDays(currentDate, 4)
       saturday = endOfWeek(nextWeek)
@@ -22,7 +28,7 @@ class DateController {
     }
     maxDate = subDays(saturday, 1)
     maxDate = format(maxDate, 'yyyy-MM-dd')
-    response.status(200).send({ minDate, maxDate })
+    response.status(200).send({ minDate, maxDate, hours })
   }
 }
 
