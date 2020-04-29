@@ -20,7 +20,15 @@ class EventController {
    */
   async index ({ request, response }) {
     try {
-      const { date } = request.all()
+      const { date, room } = request.all()
+      if (room) {
+        const events = Database
+          .select('events.id', 'users.name', 'events.room', 'events.date', 'events.time')
+          .from('events')
+          .innerJoin('users', 'users.id', 'events.user_id')
+          .where({ date, room })
+        return events
+      }
       const events = Database
         .select('events.id', 'users.name', 'events.room', 'events.date', 'events.time')
         .from('events')
