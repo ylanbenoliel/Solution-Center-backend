@@ -26,7 +26,7 @@ Route.resource('users', 'UserController')
 
 Route.group(() => {
   Route.post('/events/new', 'EventController.store')
-  Route.get('/events/list', 'EventController.index')
+  Route.post('/events/list', 'EventController.index')
   Route.get('/events/list/user', 'EventController.show')
   Route.delete('/events/:id', 'EventController.destroy')
 }).middleware('auth')
