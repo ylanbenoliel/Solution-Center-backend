@@ -14,20 +14,19 @@ class ImageController {
         }
       )
 
-      await avatarPic.moveAll(Helpers.tmpPath('uploads'), (file) => ({
-        name: `${Date.now()}-${file.clientName}`
-      }))
+      const avatarPicName = `${new Date().getTime()}.${avatarPic.subtype}`
+      await avatarPic.move(Helpers.tmpPath('uploads'), {
+        name: avatarPicName
+      })
 
-      if (!avatarPic.movedAll()) {
+      if (!avatarPic.moved()) {
         return response.status(400).send({ message: 'Erro ao salvar foto' })
       }
-      await Promise.all(
-        avatarPic
-          .movedList()
-          .map(img => user.avatar().create({ path: img.fileName }))
-      ).then(
-        response.status(200).send({ message: 'Foto enviada' })
-      )
+
+      const image = avatarPic.fileName
+
+      await user.avatar().create({ path: image })
+      response.status(200).send({ message: 'Foto enviada' })
     } catch (error) {
       response.status(error.status).send({ message: 'Erro ao enviar foto' })
     }
