@@ -19,11 +19,10 @@ class NotificationController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
    */
   async index ({ response }) {
     try {
-      const users = Database
+      const users = await Database
         .select('users.id', 'users.name', 'notifications.token')
         .from('users')
         .innerJoin('notifications', 'notifications.user_id', 'users.id')
@@ -48,12 +47,13 @@ class NotificationController {
     try {
       const { email, token } = request.all()
       const user = await User.findByOrFail('email', email)
-      const notification = await Notification.create({ user_id: user.id, token })
+      const notification = await Notification
+        .create({ user_id: user.id, token })
       return notification
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Não foi possível o código de notificação!' })
+        .send({ message: 'Erro ao salvar token.' })
     }
   }
 
@@ -70,12 +70,14 @@ class NotificationController {
       const notification = await Notification.findByOrFail('user_id', userID)
       notification.merge({ token })
       await notification.save()
-      return notification
+      return response
+        .status(200)
+        .send({ message: 'Token atualizado.' })
     } catch (error) {
       return response
         .status(error.status)
         .send(
-          { message: 'Acesso inválido' }
+          { message: 'Acesso inválido!' }
         )
     }
   }
