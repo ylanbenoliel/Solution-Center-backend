@@ -159,7 +159,7 @@ class EventController {
       const userID = auth.user.id
 
       const event = await Event.query()
-        .select('id', 'user_id', 'room', 'date', 'time')
+        .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
         .where({
           user_id: userID,
           date
