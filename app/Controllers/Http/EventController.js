@@ -14,6 +14,7 @@ const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
+const User = use('App/Models/User')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -173,6 +174,49 @@ class EventController {
       return event
     } catch (error) {
       return response.status(error.status).send({ message: 'Erro ao buscar horários.' })
+    }
+  }
+
+  /**
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async update ({ response, request, auth }) {
+    try {
+      const adminID = auth.user.id
+      const data = request.only([
+        'id',
+        'room',
+        'date',
+        'time',
+        'status_payment'
+      ])
+
+      const event = await Event.findOrFail(data.id)
+
+      const admin = await User
+        .query()
+        .select('name')
+        .where({
+          id: adminID,
+          is_admin: 1
+        })
+        .fetch()
+
+      const JSONAdmin = admin.toJSON()[0]
+
+      if (!JSONAdmin) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
+
+      event.merge(data)
+      await event.save()
+      return response.status(200).send({ message: 'Horário atualizado!' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao atualizar horário.' })
     }
   }
 

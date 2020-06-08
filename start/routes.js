@@ -34,6 +34,7 @@ Route.group(() => {
   Route.post('/events/list', 'EventController.index')
   Route.get('/events/list/user', 'EventController.show')
   Route.delete('/events/:id', 'EventController.destroy')
+  Route.patch('/events/update', 'EventController.update')
 }).middleware('auth')
 
 Route.post('/notification/register', 'NotificationController.store')
