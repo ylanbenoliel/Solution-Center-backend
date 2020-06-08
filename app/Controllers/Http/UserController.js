@@ -26,7 +26,7 @@ class UserController {
     try {
       const totalUsers = await User
         .query()
-        .select('id', 'name', 'email', 'phone', 'cpf', 'active')
+        .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg', 'active')
         .where('is_admin', '<>', '1')
         .with('avatar')
         .fetch()
@@ -51,6 +51,23 @@ class UserController {
       return response
         .status(error.status)
         .send({ message: 'Erro ao atualizar usuário' })
+    }
+  }
+
+  async show ({ auth, response }) {
+    try {
+      const userID = auth.user.id
+      const user = await User
+        .query()
+        .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg')
+        .where('id', '=', userID)
+        .with('avatar')
+        .fetch()
+      return user
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar usuário' })
     }
   }
 }

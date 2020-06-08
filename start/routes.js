@@ -16,8 +16,13 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.post('/users', 'UserController.store')
+Route.group(() => {
+  Route.post('/users', 'UserController.store')
+  Route.get('/user/details', 'UserController.show')
+}).middleware('auth')
+
 Route.post('/authenticate', 'SessionController.authenticate')
+
 Route.post('/users/:id/avatar', 'ImageController.store')
 Route.get('images/:path', 'ImageController.show')
 
