@@ -4,11 +4,17 @@
 const User = use('App/Models/User')
 
 class SessionController {
-  async authenticate ({ request, auth }) {
-    const { email, password } = request.all()
-    const { name, is_admin, active } = await User.findBy('email', email)
-    const { token } = await auth.attempt(email, password)
-    return { token, name, is_admin, active }
+  async authenticate ({ request, auth, response }) {
+    try {
+      const { email, password } = request.all()
+      const { name, is_admin, active } = await User.findBy('email', email)
+      const { token } = await auth.attempt(email, password)
+      return { token, user: { name, email }, is_admin, active }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Usuário ou senha incorretos.' })
+    }
   }
 }
 
