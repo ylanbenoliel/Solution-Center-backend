@@ -194,32 +194,22 @@ class EventController {
    */
   async update ({ response, request, auth }) {
     try {
-      const adminID = auth.user.id
+      const userID = auth.user.id
       const data = request.only([
         'id',
         'room',
         'date',
-        'time',
-        'status_payment'
+        'time'
       ])
 
-      const event = await Event.findOrFail(data.id)
+      const user = await User.findOrFail(userID)
+      const jsonUser = user.toJSON()[0]
 
-      const admin = await User
-        .query()
-        .select('name')
-        .where({
-          id: adminID,
-          is_admin: 1
-        })
-        .fetch()
-
-      const JSONAdmin = admin.toJSON()[0]
-
-      if (!JSONAdmin) {
+      if (!jsonUser) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
+      const event = await Event.findOrFail(data.id)
       event.merge(data)
       await event.save()
       return response.status(200).send({ message: 'Horário atualizado!' })
