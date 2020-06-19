@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 'use strict'
 const {
   parseISO,
@@ -14,7 +15,7 @@ const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
-const User = use('App/Models/User')
+// const User = use('App/Models/User')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -195,6 +196,7 @@ class EventController {
   async update ({ response, request, auth }) {
     try {
       const userID = auth.user.id
+
       const data = request.only([
         'id',
         'room',
@@ -202,17 +204,20 @@ class EventController {
         'time'
       ])
 
-      const user = await User.findOrFail(userID)
-      const jsonUser = user.toJSON()[0]
+      const event = await Event.findByOrFail('id', data.id)
+      const jsonEvent = event.toJSON()
 
-      if (!jsonUser) {
-        return response.status(401).send({ message: 'Não autorizado.' })
+      if (!jsonEvent || jsonEvent.user_id != userID) {
+        return response.status(401)
+          .send({ message: 'Não está autorizado a deletar esse horário' })
       }
 
-      const event = await Event.findOrFail(data.id)
       event.merge(data)
       await event.save()
-      return response.status(200).send({ message: 'Horário atualizado!' })
+
+      return response
+        .status(200)
+        .send({ message: 'Horário atualizado!' })
     } catch (error) {
       return response
         .status(error.status)
