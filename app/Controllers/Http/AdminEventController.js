@@ -10,6 +10,61 @@ class AdminEventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
+  async show ({ request, response, auth }) {
+    try {
+      const { date, user } = request.all()
+      const adminID = auth.user.id
+
+      const admin = await User
+        .query()
+        .select('name')
+        .where({
+          id: adminID,
+          is_admin: 1
+        })
+        .fetch()
+
+      const JSONAdmin = admin.toJSON()[0]
+      if (!JSONAdmin) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
+
+      let event = {}
+
+      if (date) {
+        event = await Event.query()
+          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+          .where({
+            date,
+            user_id: 47
+          })
+          .fetch()
+      } else {
+        event = await Event.query()
+          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+          .where({
+            user_id: user
+          })
+          .fetch()
+      }
+      if (event.rows.length === 0) {
+        return response
+          .status(404)
+          .send({ message: 'Nenhum horário marcado.' })
+      }
+      return event
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar horários.' })
+    }
+  }
+
+  /**
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
   async update ({ response, request, auth }) {
     try {
       const adminID = auth.user.id
@@ -86,11 +141,11 @@ class AdminEventController {
 
       return response
         .status(200)
-        .send({ message: 'Horário desmarcado' })
+        .send({ message: 'Horário desmarcado.' })
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Não foi possível verificar horários' })
+        .send({ message: 'Não foi possível verificar horários.' })
     }
   }
 }

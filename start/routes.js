@@ -46,5 +46,10 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('/dates', 'DateController.index')
-}
-).middleware('auth')
+}).middleware('auth')
+
+Route.group(() => {
+  Route.post('admin/events/list/user/', 'AdminEventController.show')
+  Route.delete('admin/events/:id/', 'AdminEventController.destroy')
+  Route.patch('admin/events/update/', 'AdminEventController.update')
+}).middleware('auth')
