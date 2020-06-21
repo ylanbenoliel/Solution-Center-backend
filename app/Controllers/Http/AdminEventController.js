@@ -137,7 +137,7 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
-      if (data.status_payment) {
+      if (data.status_payment === '1') {
         const event = await Event.findOrFail(data.id)
         await event.merge({ status_payment: data.status_payment })
         await event.save()
