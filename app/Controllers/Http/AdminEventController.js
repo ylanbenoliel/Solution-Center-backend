@@ -137,6 +137,15 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
+      if (data.status_payment) {
+        const event = await Event.findOrFail(data.id)
+        await event.merge({ status_payment: data.status_payment })
+        await event.save()
+        return response
+          .status(200)
+          .send({ message: 'Reserva paga', event })
+      }
+
       const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const evt = await Event
