@@ -137,13 +137,30 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
+      const formattedTime = `${data.time.split(':')[0]}:00:00`
+
+      const evt = await Event
+        .query()
+        .where({
+          date: data.date, time: formattedTime, room: data.room
+        })
+        .fetch()
+
+      const eventJSON = evt.toJSON()[0]
+
+      if (eventJSON) {
+        return response.status(406)
+          .send({ message: 'Já existe reserva nesse horário.' })
+      }
+
       const event = await Event.findOrFail(data.id)
-      event.merge(data)
+      const toSave = { ...data, time: formattedTime }
+      event.merge(toSave)
       await event.save()
 
       return response
         .status(200)
-        .send({ message: 'Horário atualizado!' })
+        .send({ message: 'Horário atualizado!', event })
     } catch (error) {
       return response
         .status(error.status)
