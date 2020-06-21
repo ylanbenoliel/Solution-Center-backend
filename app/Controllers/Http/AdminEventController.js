@@ -10,6 +10,49 @@ class AdminEventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
+  async store ({ request, response }) {
+    try {
+      const { user, date, time, room } = request.all()
+
+      const event = await Event
+        .query()
+        .where({
+          date, time, room
+        })
+        .fetch()
+
+      const eventJSON = event.toJSON()[0]
+
+      if (!eventJSON) {
+        return response.status(406)
+          .send({ message: 'Já existe reserva nesse horário.' })
+      }
+
+      const formattedTime = `${time.split(':')[0]}:00:00`
+
+      const data = {
+        user_id: user,
+        room,
+        date,
+        time: formattedTime
+      }
+
+      const newEvent = await Event.create(data)
+      return response.status(200).send(
+        { message: 'Horário salvo!', event: newEvent }
+      )
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Ocorreu um erro ao salvar o horário.' })
+    }
+  }
+
+  /**
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
   async show ({ request, response, auth }) {
     try {
       const { date, user } = request.all()
@@ -36,7 +79,7 @@ class AdminEventController {
           .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
           .where({
             date,
-            user_id: 47
+            user_id: user
           })
           .fetch()
       } else {
@@ -47,12 +90,16 @@ class AdminEventController {
           })
           .fetch()
       }
+
       if (event.rows.length === 0) {
         return response
           .status(404)
           .send({ message: 'Nenhum horário marcado.' })
       }
-      return event
+
+      return response
+        .status(200)
+        .send({ events: event })
     } catch (error) {
       return response
         .status(error.status)

@@ -9,3 +9,7 @@ tmp
 
 # The development sqlite file
 database/*.sqlite
+
+app/Controllers/Http/PlanController.js
+app/Models/Plan.js
+database/migrations/1592660847413_plan_schema.js
