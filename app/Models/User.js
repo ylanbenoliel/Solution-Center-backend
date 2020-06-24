@@ -46,6 +46,10 @@ class User extends Model {
   plans () {
     return this.hasMany('App/Model/Plan')
   }
+
+  messages () {
+    return this.hasMany('App/Model/Message')
+  }
 }
 
 module.exports = User
