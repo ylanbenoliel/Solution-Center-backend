@@ -18,7 +18,19 @@ class MessageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ request, response }) {
+  async index ({ response, auth }) {
+    try {
+      const userID = auth.user.id
+      const messages = await Message
+        .query()
+        .where('user_id', userID)
+        .fetch()
+      return response.status(200).send({ messages })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar mensagens.' })
+    }
   }
 
   /**
@@ -46,28 +58,6 @@ class MessageController {
         .status(error.status)
         .send({ message: 'Erro ao salvar mensagens.' })
     }
-  }
-
-  /**
-   * Display a single message.
-   * GET messages/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async show ({ params, request, response }) {
-  }
-
-  /**
-   * Update message details.
-   * PUT or PATCH messages/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
   }
 
   /**
