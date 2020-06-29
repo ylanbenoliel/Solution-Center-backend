@@ -33,14 +33,33 @@ class PlanController {
   }
 
   /**
-   * Display a single plan.
-   * GET plans/:id
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, request }) {
+  async show ({ params, response }) {
+    try {
+      const userID = params.user
+      const plans = await Plan
+        .query()
+        .where({ user_id: userID })
+        .fetch()
+
+      const plansJSON = plans.toJSON()[0]
+      if (!plansJSON) {
+        const newPlan = await Plan.findOrCreate(
+          { user_id: userID },
+          { user_id: userID, plan: 1 }
+        )
+        return { plans: newPlan }
+      }
+
+      return { plans }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar planos do usuário.' })
+    }
   }
 
   /**
