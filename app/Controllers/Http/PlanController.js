@@ -63,13 +63,34 @@ class PlanController {
 
   /**
    * Update plan details.
-   * PUT or PATCH plans/:id
+   * PUT or PATCH plans/:user
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async store ({ params, request, response }) {
+    try {
+      const userID = Number(params.user)
+      const requestPlans = request.collect(['plan'])
+
+      const mapUserPlans = requestPlans.map(plan => {
+        return { plan: Object.values(plan)[0] }
+      })
+
+      for (const data of mapUserPlans) {
+        await Plan.findOrCreate(
+          { user_id: userID, plan: data.plan },
+          { user_id: userID, plan: data.plan }
+        )
+      }
+
+      return { message: 'Planos adicionados' }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao adicionar planos do usuário.' })
+    }
   }
 
   /**

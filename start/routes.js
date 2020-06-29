@@ -61,4 +61,5 @@ Route.resource('messages', 'MessageController')
 Route.group(() => {
   Route.get('/plans', 'PlanController.index')
   Route.get('/plans/:user', 'PlanController.show')
+  Route.post('/plans/:user', 'PlanController.store')
 }).middleware('auth')
