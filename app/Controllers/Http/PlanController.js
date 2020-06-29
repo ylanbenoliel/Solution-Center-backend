@@ -20,9 +20,8 @@ class PlanController {
   async index ({ response, auth }) {
     try {
       const userID = auth.user.id
-      const plans = await Plan.findOrCreate(
-        { user_id: userID },
-        { user_id: userID, plan: 1 }
+      const plans = await Plan.findByOrFail(
+        { user_id: userID }
       )
       return plans
     } catch (error) {
