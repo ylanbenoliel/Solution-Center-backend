@@ -57,3 +57,7 @@ Route.group(() => {
 
 Route.resource('messages', 'MessageController')
   .apiOnly().except(['show', 'update']).middleware('auth')
+
+Route.group(() => {
+  Route.get('/plans', 'PlanController.index')
+}).middleware('auth')
