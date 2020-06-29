@@ -15,7 +15,6 @@ class MessageController {
    * GET messages
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async index ({ response, auth }) {
@@ -65,10 +64,37 @@ class MessageController {
    * DELETE messages/:id
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, response, auth }) {
+    try {
+      const messageID = params.id
+      const userID = auth.user.id
+
+      const message = await Message.findOrFail(messageID)
+
+      const messageJson = message.toJSON()
+
+      if (messageJson && messageJson.user_id !== userID) {
+        return response
+          .status(401)
+          .send({ message: 'Usuário sem permissão.' })
+      }
+
+      await Message
+        .query()
+        .where({
+          id: messageID
+        }).delete()
+
+      return response
+        .status(200)
+        .send({ message: 'Mensagem apagada.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao excluir mensagem.' })
+    }
   }
 }
 
