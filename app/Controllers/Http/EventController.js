@@ -45,16 +45,30 @@ class EventController {
       }
 
       if (room) {
-        query = await Database
-          .select('events.id as event',
-            'users.id as user',
-            'users.name',
-            'events.room',
-            'events.date',
-            'events.time')
-          .from('events')
-          .innerJoin('users', 'users.id', 'events.user_id')
-          .where({ date, room })
+        if (room != 10) {
+          query = await Database
+            .select('events.id as event',
+              'users.id as user',
+              'users.name',
+              'events.room',
+              'events.date',
+              'events.time')
+            .from('events')
+            .innerJoin('users', 'users.id', 'events.user_id')
+            .where({ date, room })
+        } else if (room == 10) {
+          query = await Database
+            .select('events.id as event',
+              'users.id as user',
+              'users.name',
+              'events.room',
+              'events.date',
+              'events.time')
+            .from('events')
+            .innerJoin('users', 'users.id', 'events.user_id')
+            .where({ room: 8 }).orWhere({ room: 9 })
+            .andWhere({ date })
+        }
       } else {
         query = await Database
           .select('events.id as event',
@@ -89,7 +103,9 @@ class EventController {
             }
           }
 
-          if (isBefore(parsedDate, currentDate) || (dateTimeDistance.includes('min') || (dateTimeDistance.includes('hour') && timeDistArray < 6))) {
+          if (isBefore(parsedDate, currentDate) ||
+          (dateTimeDistance.includes('min') ||
+          (dateTimeDistance.includes('hour') && timeDistArray < 6))) {
             code = '3'
             return {
               ...event,
@@ -97,7 +113,8 @@ class EventController {
             }
           }
 
-          if (dateTimeDistance.includes('day') || (dateTimeDistance.includes('hour') && timeDistArray >= 6)) {
+          if (dateTimeDistance.includes('day') ||
+          (dateTimeDistance.includes('hour') && timeDistArray >= 6)) {
             code = '2'
             return {
               ...event,
