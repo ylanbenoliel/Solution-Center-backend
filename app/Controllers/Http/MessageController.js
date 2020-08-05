@@ -24,7 +24,7 @@ class MessageController {
         .query()
         .where('user_id', userID)
         .fetch()
-      return response.status(200).send({ messages })
+      return messages
     } catch (error) {
       return response
         .status(error.status)
