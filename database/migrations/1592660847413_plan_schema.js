@@ -14,7 +14,7 @@ class PlanSchema extends Schema {
         .inTable('users')
         .onUpdate('CASCADE')
         .onDelete('SET NULL')
-      table.enu('plan', [1, 2, 3, 4, 5, 6]).defaultsTo(1)
+      table.enu('plan', [1, 2, 3, 4, 5]).defaultsTo(1)
       table.timestamps()
     })
   }

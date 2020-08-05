@@ -50,10 +50,10 @@ class PlanController {
           { user_id: userID },
           { user_id: userID, plan: 1 }
         )
-        return { plans: newPlan }
+        return  newPlan
       }
 
-      return { plans }
+      return  plans 
     } catch (error) {
       return response
         .status(error.status)
