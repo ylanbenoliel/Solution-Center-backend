@@ -26,8 +26,7 @@ class UserController {
     try {
       const totalUsers = await User
         .query()
-        .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg', 'active')
-        .where('is_admin', '<>', '1')
+        .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg', 'active', 'is_admin')
         .with('avatar')
         .fetch()
       return totalUsers
