@@ -23,7 +23,7 @@ class AdminEventController {
 
       const eventJSON = event.toJSON()[0]
 
-      if (!eventJSON) {
+      if (eventJSON) {
         return response.status(406)
           .send({ message: 'Já existe reserva nesse horário.' })
       }
@@ -137,7 +137,7 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
-      if (data.status_payment === '1') {
+      if (data.status_payment === 1) {
         const event = await Event.findOrFail(data.id)
         await event.merge({ status_payment: data.status_payment })
         await event.save()
