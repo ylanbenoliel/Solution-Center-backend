@@ -14,7 +14,7 @@ class EventSchema extends Schema {
         .inTable('users')
         .onUpdate('CASCADE')
         .onDelete('SET NULL')
-      table.enu('room', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+      table.enu('room', [1, 2, 3, 4, 5, 6, 7, 8, 9])
       table.datetime('date').notNullable()
       table.time('time').notNullable()
       table.boolean('status_payment').defaultsTo(false)

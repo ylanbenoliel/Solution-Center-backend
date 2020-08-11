@@ -45,30 +45,16 @@ class EventController {
       }
 
       if (room) {
-        if (room != 10) {
-          query = await Database
-            .select('events.id as event',
-              'users.id as user',
-              'users.name',
-              'events.room',
-              'events.date',
-              'events.time')
-            .from('events')
-            .innerJoin('users', 'users.id', 'events.user_id')
-            .where({ date, room })
-        } else if (room == 10) {
-          query = await Database
-            .select('events.id as event',
-              'users.id as user',
-              'users.name',
-              'events.room',
-              'events.date',
-              'events.time')
-            .from('events')
-            .innerJoin('users', 'users.id', 'events.user_id')
-            .where({ room: 8 }).orWhere({ room: 9 })
-            .andWhere({ date })
-        }
+        query = await Database
+          .select('events.id as event',
+            'users.id as user',
+            'users.name',
+            'events.room',
+            'events.date',
+            'events.time')
+          .from('events')
+          .innerJoin('users', 'users.id', 'events.user_id')
+          .where({ date, room })
       } else {
         query = await Database
           .select('events.id as event',
