@@ -15,6 +15,7 @@ const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
+const User = use('App/Models/User')
 // const User = use('App/Models/User')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -34,6 +35,12 @@ class EventController {
     try {
       const { date, room } = request.all()
       const userID = auth.user.id
+
+      const { active } = await User.find(userID)
+      if (!active) {
+        return response.status(200).send({ active })
+      }
+
       let query = {}
       let hoursInterval = []
       const ISODate = parseISO(date)
