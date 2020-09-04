@@ -10,8 +10,8 @@ const {
   isBefore
 } = require('date-fns')
 
-const HOURS_SATURDAY = ['08', '09', '10', '11', '12', '13']
-const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
+const HOURS_SATURDAY = ['08', '09', '10', '11']
+const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
 
 const Database = use('Database')
 const Event = use('App/Models/Event')

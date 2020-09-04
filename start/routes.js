@@ -51,6 +51,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('admin/events/new', 'AdminEventController.store')
+  Route.post('admin/events/agenda', 'AdminEventController.agenda')
   Route.post('admin/events/list/user', 'AdminEventController.show')
   Route.delete('admin/events/:id', 'AdminEventController.destroy')
   Route.patch('admin/events/update', 'AdminEventController.update')
