@@ -47,7 +47,7 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.group(() => {
-  Route.get('/dates', 'DateController.index')
+  Route.get('/dates', 'DateController.show')
 }).middleware('auth')
 
 Route.group(() => {
