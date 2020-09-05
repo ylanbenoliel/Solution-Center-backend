@@ -13,7 +13,7 @@ class PlanSchema extends Schema {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('SET NULL')
+        .onDelete('CASCADE')
       table.enu('plan', [1, 2, 3])
       table.timestamps()
     })

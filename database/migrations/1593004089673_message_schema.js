@@ -13,7 +13,7 @@ class MessageSchema extends Schema {
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')
-        .onDelete('SET NULL')
+        .onDelete('CASCADE')
       table.string('message')
       table.timestamps()
     })
