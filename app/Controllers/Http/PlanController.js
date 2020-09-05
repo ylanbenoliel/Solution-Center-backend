@@ -69,27 +69,20 @@ class PlanController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ params, request, response }) {
+  async update ({ params, request, response }) {
     try {
       const userID = Number(params.user)
-      const requestPlans = request.collect(['plan'])
+      const { plan: requestPlan } = request.all()
 
-      const mapUserPlans = requestPlans.map(plan => {
-        return { plan: Object.values(plan)[0] }
-      })
+      const plan = await Plan.findByOrFail('user_id', userID)
+      plan.merge({ plan: requestPlan })
+      await plan.save()
 
-      for (const data of mapUserPlans) {
-        await Plan.findOrCreate(
-          { user_id: userID, plan: data.plan },
-          { user_id: userID, plan: data.plan }
-        )
-      }
-
-      return { message: 'Planos adicionados' }
+      return { message: 'Plano Editado.' }
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao adicionar planos do usuário.' })
+        .send({ message: 'Erro ao editar planos do usuário.' })
     }
   }
 
