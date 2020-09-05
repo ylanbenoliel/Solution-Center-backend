@@ -20,6 +20,7 @@ Route.post('/users', 'UserController.store')
 
 Route.group(() => {
   Route.get('/user/details', 'UserController.show')
+  Route.get('/users/debt', 'UserController.debt')
 }).middleware('auth')
 
 Route.resource('users', 'UserController')

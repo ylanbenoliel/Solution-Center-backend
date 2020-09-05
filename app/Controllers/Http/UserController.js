@@ -1,5 +1,6 @@
 'use strict'
 
+const Database = use('Database')
 const User = use('App/Models/User')
 class UserController {
   async store ({ request, response }) {
@@ -45,11 +46,11 @@ class UserController {
       await user.save()
       return response
         .status(200)
-        .send({ message: 'Usuário atualizado' })
+        .send({ message: 'Usuário atualizado.' })
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao atualizar usuário' })
+        .send({ message: 'Erro ao atualizar usuário.' })
     }
   }
 
@@ -66,7 +67,27 @@ class UserController {
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao buscar usuário' })
+        .send({ message: 'Erro ao buscar usuário.' })
+    }
+  }
+
+  async debt ({ response }) {
+    try {
+      const query = await Database
+        .select('users.name')
+        .distinct('users.name')
+        .from('users')
+        .innerJoin('events', 'users.id', 'events.user_id')
+        .where({ 'events.status_payment': false })
+
+      const namesArray = query.map((name) => {
+        return Object.values(name)
+      }).flat(1)
+      return { names: namesArray }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar pendências.' })
     }
   }
 }
