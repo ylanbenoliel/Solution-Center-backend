@@ -104,16 +104,16 @@ class UserController {
   async debt ({ response }) {
     try {
       const query = await Database
-        .select('users.name')
-        .distinct('users.name')
+        .select('users.id')
+        .distinct('users.id')
         .from('users')
         .innerJoin('events', 'users.id', 'events.user_id')
         .where({ 'events.status_payment': false })
 
-      const namesArray = query.map((name) => {
-        return Object.values(name)
+      const idsArray = query.map((id) => {
+        return Object.values(id)
       }).flat(1)
-      return { names: namesArray }
+      return { ids: idsArray }
     } catch (error) {
       return response
         .status(error.status)
