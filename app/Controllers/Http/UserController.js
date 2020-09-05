@@ -2,7 +2,34 @@
 
 const Database = use('Database')
 const User = use('App/Models/User')
+const Plan = use('App/Models/Plan')
+const Message = use('App/Models/Message')
 class UserController {
+  async createPlan (id) {
+    await Plan.create({ user_id: id, plan: 1 })
+  }
+
+  async welcomeUser (name) {
+    try {
+      const admin = await User
+        .query()
+        .select('id')
+        .where('is_admin', 1)
+        .fetch()
+
+      const adminArray = admin.toJSON().flat(1)
+      const messageString = `Usuário ${name} se cadastrou.`
+
+      const dataToStore = adminArray.map(adm => {
+        return { user_id: Object.values(adm), message: messageString }
+      })
+
+      await Message.createMany(dataToStore)
+    } catch (error) {
+      throw new Error('Erro ao enviar mensagens.')
+    }
+  }
+
   async store ({ request, response }) {
     try {
       const data = request.only([
@@ -14,8 +41,11 @@ class UserController {
           .status(400)
           .send({ message: 'Usuário já registrado!' })
       }
-      const user = await User.create(data)
-      return user
+      const { id } = await User.create(data)
+      this.createPlan(id)
+      this.welcomeUser(data.name)
+
+      return { message: 'Usuário cadastrado.' }
     } catch (error) {
       return response
         .status(400)
