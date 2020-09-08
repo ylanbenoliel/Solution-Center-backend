@@ -47,15 +47,6 @@ class PlanController {
         .where({ user_id: userID })
         .fetch()
 
-      const plansJSON = plans.toJSON()[0]
-      if (!plansJSON) {
-        const newPlan = await Plan.findOrCreate(
-          { user_id: userID },
-          { user_id: userID, plan: 1 }
-        )
-        return newPlan
-      }
-
       return plans.toJSON()[0]
     } catch (error) {
       return response
