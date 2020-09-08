@@ -1,6 +1,7 @@
 'use strict'
 const {
   endOfWeek,
+  isSaturday,
   isFriday,
   isThursday,
   addDays,
@@ -11,7 +12,7 @@ const Plan = use('App/Models/Plan')
 class DateController {
   whichSaturday (day, func) {
     let dayReturn = {}
-    if (func(day)) {
+    if (func(day) || isSaturday(day)) {
       const nextWeek = addDays(day, 4)
       dayReturn = endOfWeek(nextWeek)
     } else {
@@ -31,7 +32,7 @@ class DateController {
       const plan = await Plan.findBy('user_id', userID)
       const planJSON = plan.toJSON()
 
-      if (planJSON.plan != 1) {
+      if (Number(planJSON.plan) !== 1) {
         maxDate = addDays(new Date(planJSON.updated_at), 30)
         saturday = this.whichSaturday(maxDate, isThursday)
       } else {
@@ -43,7 +44,7 @@ class DateController {
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao buscar Datas.' })
+        .send({ message: 'Erro ao buscar datas.' })
     }
   }
 }
