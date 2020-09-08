@@ -31,6 +31,8 @@ class PlanController {
     }
   }
 
+  // #FIXME remove create feature in show
+
   /**
    *
    * @param {object} ctx
@@ -41,6 +43,7 @@ class PlanController {
       const userID = params.user
       const plans = await Plan
         .query()
+        .select('plan')
         .where({ user_id: userID })
         .fetch()
 
@@ -53,7 +56,7 @@ class PlanController {
         return newPlan
       }
 
-      return plans
+      return plans.toJSON()[0]
     } catch (error) {
       return response
         .status(error.status)
