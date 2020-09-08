@@ -58,6 +58,7 @@ class UserController {
       const totalUsers = await User
         .query()
         .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg', 'active', 'is_admin')
+        .orderBy('name')
         .with('avatar')
         .fetch()
       return totalUsers
