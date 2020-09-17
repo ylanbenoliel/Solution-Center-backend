@@ -10,8 +10,41 @@ const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16
 const Database = use('Database')
 const Event = use('App/Models/Event')
 const User = use('App/Models/User')
+const Log = use('App/Models/Log')
 
 class AdminEventController {
+  async writeLog (adminID, message) {
+    try {
+      const admin = await User
+        .query()
+        .select('name')
+        .where({
+          id: adminID
+        })
+        .fetch()
+
+      let adminName = admin.toJSON()[0]
+      adminName = adminName.name.split(' ')[0]
+      const messageString = `${adminName} ${message}`
+
+      const allAdmins = await User
+        .query()
+        .select('id')
+        .where('is_admin', 1)
+        .fetch()
+
+      const adminArray = allAdmins.toJSON().flat(1)
+      const dataToStore = adminArray.map(adm => {
+        return { user_id: Object.values(adm), log: messageString }
+      })
+
+      await Log.createMany(dataToStore)
+    } catch (error) {
+      const errorData = new Date()
+      throw new Error(`Erro ao salvar registros. ${errorData}`)
+    }
+  }
+
   /**
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -139,10 +172,11 @@ class AdminEventController {
           .fetch()
       }
 
-      if (event.rows.length === 0) {
+      const eventJson = event.toJSON()[0]
+      if (!eventJson) {
         return response
-          .status(404)
-          .send({ message: 'Nenhum horário marcado.' })
+          .status(204)
+          .send({ message: 'Não possui reservas.' })
       }
 
       return response
