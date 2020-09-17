@@ -3,7 +3,7 @@
 const Database = use('Database')
 const User = use('App/Models/User')
 const Plan = use('App/Models/Plan')
-const Message = use('App/Models/Message')
+const Log = use('App/Models/Log')
 class UserController {
   async createPlan (id) {
     await Plan.create({ user_id: id, plan: 1 })
@@ -21,12 +21,13 @@ class UserController {
       const messageString = `Usuário ${name} se cadastrou.`
 
       const dataToStore = adminArray.map(adm => {
-        return { user_id: Object.values(adm), message: messageString }
+        return { user_id: Object.values(adm), log: messageString }
       })
 
-      await Message.createMany(dataToStore)
+      await Log.createMany(dataToStore)
     } catch (error) {
-      throw new Error('Erro ao enviar mensagens.')
+      const errorData = new Date()
+      throw new Error(`Erro ao enviar registro de novo usuário. ${errorData}`)
     }
   }
 
