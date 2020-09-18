@@ -224,6 +224,7 @@ class AdminEventController {
             date,
             user_id: user
           })
+          .orderBy('updated_at', 'desc')
           .fetch()
       } else {
         event = await Event.query()
@@ -231,6 +232,7 @@ class AdminEventController {
           .where({
             user_id: user
           })
+          .orderBy('updated_at', 'desc')
           .fetch()
       }
 
