@@ -56,6 +56,7 @@ Route.group(() => {
   Route.post('admin/events/list/user', 'AdminEventController.show')
   Route.delete('admin/events/:id', 'AdminEventController.destroy')
   Route.patch('admin/events/update', 'AdminEventController.update')
+  Route.patch('admin/events/payment', 'AdminEventController.payment')
 }).middleware('auth')
 
 Route.resource('messages', 'MessageController')

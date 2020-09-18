@@ -1,7 +1,9 @@
+/* eslint-disable camelcase */
 'use strict'
 const {
   parseISO,
-  isSaturday
+  isSaturday,
+  format
 } = require('date-fns')
 
 const HOURS_SATURDAY = ['08', '09', '10', '11', '12', '13']
@@ -37,7 +39,7 @@ class AdminEventController {
       const dataToStore = adminArray.map(adm => {
         return { user_id: Object.values(adm), log: messageString }
       })
-      // console.log(dataToStore)
+
       await Log.createMany(dataToStore)
     } catch (error) {
       const errorData = new Date()
@@ -256,9 +258,10 @@ class AdminEventController {
         'id',
         'room',
         'date',
-        'time',
-        'status_payment'
+        'time'
       ])
+
+      const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const admin = await User
         .query()
@@ -273,17 +276,6 @@ class AdminEventController {
       if (!JSONAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
-
-      if (data.status_payment === 1) {
-        const event = await Event.findOrFail(data.id)
-        await event.merge({ status_payment: data.status_payment })
-        await event.save()
-        return response
-          .status(200)
-          .send({ message: 'Reserva paga', event })
-      }
-
-      const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const evt = await Event
         .query()
@@ -311,6 +303,52 @@ class AdminEventController {
       return response
         .status(error.status)
         .send({ message: 'Erro ao atualizar horário.' })
+    }
+  }
+
+  async payment ({ request, response, auth }) {
+    try {
+      const { id, status_payment } = request.all()
+      const adminID = auth.user.id
+      const dateString = format(new Date(), 'yyyy-MM-dd')
+
+      const event = await Event.findOrFail(id)
+      const { user_id, time, room } = event.toJSON()
+      await event.merge({ status_payment: status_payment })
+      await event.save()
+      const name = await this.getUserName(Number(user_id))
+      const roomName = await this.roomName(Number(room))
+
+      if (status_payment === 1) {
+        const messageString =
+           'confirmou pagamento de ' +
+           `${name}, ` +
+           `Sala ${roomName}, ` +
+           `Dia ${this.dateWithBars(dateString)}, Hora ${time}`
+
+        this.writeLog(adminID, messageString)
+
+        return response
+          .status(200)
+          .send({ message: 'Pagamento efetuado.', event })
+      }
+      if (status_payment === 0) {
+        const messageString =
+           'removeu pagamento de ' +
+           `${name}, ` +
+           `Sala ${roomName}, ` +
+           `Dia ${this.dateWithBars(dateString)}, Hora ${time}`
+
+        this.writeLog(adminID, messageString)
+
+        return response
+          .status(200)
+          .send({ message: 'Pagamento não efetuado', event })
+      }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível alterar pagamento.' })
     }
   }
 
