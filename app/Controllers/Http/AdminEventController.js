@@ -71,7 +71,12 @@ class AdminEventController {
  * @param {string} date
  * @returns {string} dateBars
  */
-  dateWithBars (date) {
+  async dateWithBars (date) {
+    if (date.includes('T')) {
+      let dateWithTimeZone = await date.split('T')[0]
+      dateWithTimeZone = dateWithTimeZone.split('-').reverse().join('/')
+      return dateWithTimeZone
+    }
     const dateBars = date.split('-').reverse().join('/')
     return dateBars
   }
@@ -367,7 +372,7 @@ class AdminEventController {
 
       const admin = await User
         .query()
-        .select('name')
+        .select('id')
         .where({
           id: adminID,
           is_admin: 1
@@ -378,14 +383,23 @@ class AdminEventController {
       if (!JSONAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
+      const event = await Event.findOrFail(eventID)
+      const { user_id, time, room } = event.toJSON()
+      const name = await this.getUserName(Number(user_id))
+      const roomName = await this.roomName(Number(room))
 
       await Event.query()
-        .where(
-          {
-            id: eventID
-          }
-        )
+        .where({ id: eventID })
         .delete()
+
+      const messageString =
+        'apagou reserva de ' +
+        `${name}, ` +
+        `Sala ${roomName}, ` +
+        // `Dia ${this.dateWithBars(date)}, `+
+        `Hora ${time}`
+
+      this.writeLog(adminID, messageString)
 
       return response
         .status(200)
