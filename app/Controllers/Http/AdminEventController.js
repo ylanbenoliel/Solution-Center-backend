@@ -100,6 +100,66 @@ class AdminEventController {
     }
   }
 
+  async eventsWithDebt ({ request, response, auth }) {
+    try {
+      const { date, user } = request.all()
+      const adminID = auth.user.id
+
+      const admin = await User
+        .query()
+        .select('name')
+        .where({
+          id: adminID,
+          is_admin: 1
+        })
+        .fetch()
+
+      const JSONAdmin = admin.toJSON()[0]
+      if (!JSONAdmin) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
+
+      let event = {}
+
+      if (date) {
+        event = await Event.query()
+          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+          .where({
+            date,
+            user_id: user,
+            status_payment: 0
+          })
+          .orderBy('updated_at', 'desc')
+          .fetch()
+      } else {
+        event = await Event.query()
+          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+          .where({
+            user_id: user,
+            status_payment: 0
+          })
+          .orderBy('updated_at', 'desc')
+          .fetch()
+      }
+
+      const eventJson = event.toJSON()[0]
+      if (!eventJson) {
+        return response
+          .status(204)
+          .send()
+          // .send({ message: 'Usuário em dia com os pagamentos.' })
+      }
+
+      return response
+        .status(200)
+        .send({ events: event })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar horários.' })
+    }
+  }
+
   /**
    * @param {object} ctx
    * @param {Request} ctx.request
