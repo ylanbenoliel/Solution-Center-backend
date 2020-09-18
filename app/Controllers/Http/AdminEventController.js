@@ -37,11 +37,59 @@ class AdminEventController {
       const dataToStore = adminArray.map(adm => {
         return { user_id: Object.values(adm), log: messageString }
       })
-
+      // console.log(dataToStore)
       await Log.createMany(dataToStore)
     } catch (error) {
       const errorData = new Date()
       throw new Error(`Erro ao salvar registros. ${errorData}`)
+    }
+  }
+
+  roomName (roomId) {
+    const roomData = [
+      { id: 1, name: 'Clarice Lispector' },
+      { id: 2, name: 'Carlos Drummond de Andrade' },
+      { id: 3, name: 'Cecília Meireles' },
+      { id: 4, name: 'Rui Barbosa' },
+      { id: 5, name: 'Machado de Assis' },
+      { id: 6, name: 'Monteiro Lobato' },
+      { id: 7, name: 'Luís Fernando Veríssimo' },
+      { id: 8, name: 'Cora Coralina' },
+      { id: 9, name: 'Carolina de Jesus' }
+    ]
+    const ROOM_NAME = roomData.map((room) => {
+      if (room.id === roomId) {
+        return room.name.split(' ')[0]
+      } return false
+    }).filter((room) => room)
+    return ROOM_NAME[0]
+  }
+
+  /**
+ * @param {string} date
+ * @returns {string} dateBars
+ */
+  dateWithBars (date) {
+    const dateBars = date.split('-').reverse().join('/')
+    return dateBars
+  }
+
+  /**
+ * @param {number} userId
+ * @returns {string} userName
+ */
+  async getUserName (userId) {
+    try {
+      const userDB = await User
+        .query()
+        .select('name')
+        .where('id', userId)
+        .fetch()
+      let userName = userDB.toJSON()[0]
+      userName = userName.name
+      return userName
+    } catch (error) {
+      throw new Error('Erro ao recuperar nome do usuário.')
     }
   }
 
@@ -91,9 +139,10 @@ class AdminEventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, response, auth }) {
     try {
       const { user, date, time, room } = request.all()
+      const adminID = auth.user.id
 
       const event = await Event
         .query()
@@ -119,9 +168,15 @@ class AdminEventController {
       }
 
       const newEvent = await Event.create(data)
-      return response.status(200).send(
-        { message: 'Horário salvo!', event: newEvent }
-      )
+
+      this.writeLog(adminID,
+        `criou reserva para ${this.getUserName(user)}, Sala ${this.roomName(room)},` +
+        ` Dia ${this.dateWithBars(date)}, Hora ${formattedTime}`)
+
+      return response.status(200).send({
+        message: 'Horário salvo!',
+        event: newEvent
+      })
     } catch (error) {
       return response
         .status(error.status)
