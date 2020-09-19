@@ -68,3 +68,6 @@ Route.group(() => {
   Route.get('/plans/:user', 'PlanController.show')
   Route.post('/plans/:user', 'PlanController.update')
 }).middleware('auth')
+
+Route.get('/logs', 'LogController.index')
+  .middleware('auth')
