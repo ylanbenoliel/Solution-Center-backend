@@ -8,6 +8,17 @@ const {
 
 const HOURS_SATURDAY = ['08', '09', '10', '11', '12', '13']
 const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
+const ROOM_DATA = [
+  { id: 1, name: 'Clarice Lispector' },
+  { id: 2, name: 'Carlos Drummond de Andrade' },
+  { id: 3, name: 'Cecília Meireles' },
+  { id: 4, name: 'Rui Barbosa' },
+  { id: 5, name: 'Machado de Assis' },
+  { id: 6, name: 'Monteiro Lobato' },
+  { id: 7, name: 'Luís Fernando Veríssimo' },
+  { id: 8, name: 'Cora Coralina' },
+  { id: 9, name: 'Carolina de Jesus' }
+]
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
@@ -48,18 +59,7 @@ class AdminEventController {
   }
 
   roomName (roomId) {
-    const roomData = [
-      { id: 1, name: 'Clarice Lispector' },
-      { id: 2, name: 'Carlos Drummond de Andrade' },
-      { id: 3, name: 'Cecília Meireles' },
-      { id: 4, name: 'Rui Barbosa' },
-      { id: 5, name: 'Machado de Assis' },
-      { id: 6, name: 'Monteiro Lobato' },
-      { id: 7, name: 'Luís Fernando Veríssimo' },
-      { id: 8, name: 'Cora Coralina' },
-      { id: 9, name: 'Carolina de Jesus' }
-    ]
-    const ROOM_NAME = roomData.map((room) => {
+    const ROOM_NAME = ROOM_DATA.map((room) => {
       if (room.id === roomId) {
         return room.name.split(' ')[0]
       } return false
@@ -168,6 +168,7 @@ class AdminEventController {
   async agenda ({ request, response }) {
     try {
       const { date } = request.all()
+      const ROOM_IDS = ROOM_DATA.map((data) => data.room)
 
       let query = {}
       let hoursInterval = []
@@ -190,9 +191,49 @@ class AdminEventController {
         .innerJoin('users', 'users.id', 'events.user_id')
         .where({ date })
 
+      const noEvent = {
+        index: 0,
+        name: '',
+        date: date,
+        time: '',
+        room: ''
+      }
+      const rawEvents = []
+
+      let index = 1
+
+      for (let i = 0; i < hoursInterval.length; i++) {
+        const hour = hoursInterval[i]
+        for (let j = 0; j < ROOM_IDS.length; j++) {
+          const room = j + 1
+
+          const hasEvent = query
+            .find(event => Number(event.room) === room && event.time.includes(hour))
+          if (!hasEvent) {
+            const hasNoEvent = {
+              ...noEvent,
+              index,
+              room,
+              time: `${hour}:00:00`
+            }
+            rawEvents.push(hasNoEvent)
+          } else {
+            const userHasEvent = {
+              index,
+              ...hasEvent,
+              date: date,
+              room: room
+            }
+            rawEvents.push(userHasEvent)
+          }
+
+          index++
+        }
+      }
+
       return response.status(200).send({
         hoursInterval,
-        events: query
+        events: rawEvents
       })
     } catch (error) {
       return response
