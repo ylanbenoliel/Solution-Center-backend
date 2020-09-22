@@ -46,7 +46,7 @@ class UserController {
       this.createPlan(id)
       this.welcomeUser(data.name)
 
-      return { message: 'Usuário cadastrado.' }
+      return { message: 'Usuário cadastrado.', id }
     } catch (error) {
       return response
         .status(400)
