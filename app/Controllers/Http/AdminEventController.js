@@ -200,7 +200,7 @@ class AdminEventController {
       }
       const rawEvents = []
 
-      let index = 1
+      let index = 0
 
       for (let i = 0; i < hoursInterval.length; i++) {
         const hour = hoursInterval[i]
