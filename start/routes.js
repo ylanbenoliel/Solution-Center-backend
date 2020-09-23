@@ -30,6 +30,7 @@ Route.post('/authenticate', 'SessionController.authenticate')
 
 Route.post('/users/:id/avatar', 'ImageController.store')
 Route.get('images/:path', 'ImageController.show')
+Route.put('images', 'ImageController.update').middleware('auth')
 
 Route.group(() => {
   Route.post('/events/new', 'EventController.store')
