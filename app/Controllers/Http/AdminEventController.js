@@ -129,7 +129,7 @@ class AdminEventController {
             user_id: user,
             status_payment: 0
           })
-          .orderBy('updated_at', 'desc')
+          .orderBy('date', 'desc')
           .fetch()
       } else {
         event = await Event.query()
@@ -138,7 +138,7 @@ class AdminEventController {
             user_id: user,
             status_payment: 0
           })
-          .orderBy('updated_at', 'desc')
+          .orderBy('date', 'desc')
           .fetch()
       }
 
@@ -299,7 +299,7 @@ class AdminEventController {
    */
   async show ({ request, response, auth }) {
     try {
-      const { date, user } = request.all()
+      const { user } = request.all()
       const adminID = auth.user.id
 
       const admin = await User
@@ -318,24 +318,13 @@ class AdminEventController {
 
       let event = {}
 
-      if (date) {
-        event = await Event.query()
-          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
-          .where({
-            date,
-            user_id: user
-          })
-          .orderBy('updated_at', 'desc')
-          .fetch()
-      } else {
-        event = await Event.query()
-          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
-          .where({
-            user_id: user
-          })
-          .orderBy('updated_at', 'desc')
-          .fetch()
-      }
+      event = await Event.query()
+        .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+        .where({
+          user_id: user
+        })
+        .orderBy('date', 'desc')
+        .fetch()
 
       const eventJson = event.toJSON()[0]
       if (!eventJson) {
