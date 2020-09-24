@@ -1,6 +1,7 @@
 'use strict'
 
 const Message = use('App/Models/Message')
+const Notification = use('App/Models/Notification')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -10,6 +11,25 @@ const Message = use('App/Models/Message')
  * Resourceful controller for interacting with messages
  */
 class MessageController {
+  async prepareNotifications (message, userArray) {
+    const body = { body: message }
+    const notificationTokens = []
+    for (let i = 0; i < userArray.length; i++) {
+      const userID = userArray[i].user
+      const pushToken = await Notification
+        .query()
+        .select('token')
+        .where({ user_id: userID })
+        .fetch()
+      if (pushToken.rows.length === 0) {
+        continue
+      }
+      notificationTokens.push(pushToken.toJSON()[0].token)
+    }
+    const toSend = { to: notificationTokens, ...body }
+    return toSend
+  }
+
   /**
    * Show a list of all messages.
    * GET messages
@@ -44,11 +64,12 @@ class MessageController {
     try {
       const userArray = request.collect(['user'])
       const messageData = request.only('message')
-      const messageString = Object.values(messageData)[0]
+      const messageString = messageData.message
 
       const dataToStore = userArray.map(user => {
-        return { user_id: Object.values(user)[0], message: messageString }
+        return { user_id: user.user, message: messageString }
       })
+      // const whatTo = this.prepareNotifications(messageString, userArray)
 
       await Message.createMany(dataToStore)
       return response.status(200).send({ message: 'Mensagens salvas.' })
