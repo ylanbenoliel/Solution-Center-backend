@@ -37,13 +37,17 @@ class MessageController {
    * @param {object} ctx
    * @param {Response} ctx.response
    */
-  async index ({ response, auth }) {
+  async index ({ request, response, auth }) {
     try {
       const userID = auth.user.id
+      const page = request.input('page', 1)
+
       const messages = await Message
         .query()
         .where('user_id', userID)
-        .fetch()
+        .orderBy('id', 'desc')
+        .paginate(page)
+
       return messages
     } catch (error) {
       return response

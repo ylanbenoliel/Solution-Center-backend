@@ -164,24 +164,18 @@ class EventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ auth, response }) {
+  async show ({ request, response, auth }) {
     try {
       const userID = auth.user.id
-      let event = {}
-
-      event = await Event.query()
+      const page = request.input('page', 1)
+      const event = await Event.query()
         .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
         .where({
           user_id: userID
         })
         .orderBy('date', 'desc')
-        .fetch()
+        .paginate(page)
 
-      if (event.rows.length === 0) {
-        return response
-          .status(404)
-          .send({ message: 'Nenhum horário marcado.' })
-      }
       return event
     } catch (error) {
       return response.status(error.status).send({ message: 'Erro ao buscar horários.' })

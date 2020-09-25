@@ -20,12 +20,13 @@ class LogController {
    */
   async index ({ request, response, auth }) {
     try {
+      const page = request.input('page', 1)
       const userID = auth.user.id
       const logs = await Log
         .query()
         .where('user_id', userID)
         .orderBy('id', 'desc')
-        .fetch()
+        .paginate(page)
 
       return logs
     } catch (error) {

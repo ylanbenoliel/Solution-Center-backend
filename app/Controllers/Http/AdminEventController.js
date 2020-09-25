@@ -103,6 +103,7 @@ class AdminEventController {
   async eventsWithDebt ({ request, response, auth }) {
     try {
       const { date, user } = request.all()
+      const page = request.input('page', 1)
       const adminID = auth.user.id
 
       const admin = await User
@@ -130,7 +131,7 @@ class AdminEventController {
             status_payment: 0
           })
           .orderBy('date', 'desc')
-          .fetch()
+          .paginate(page)
       } else {
         event = await Event.query()
           .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
@@ -139,20 +140,10 @@ class AdminEventController {
             status_payment: 0
           })
           .orderBy('date', 'desc')
-          .fetch()
+          .paginate(page)
       }
 
-      const eventJson = event.toJSON()[0]
-      if (!eventJson) {
-        return response
-          .status(204)
-          .send()
-          // .send({ message: 'Usuário em dia com os pagamentos.' })
-      }
-
-      return response
-        .status(200)
-        .send({ events: event })
+      return event
     } catch (error) {
       return response
         .status(error.status)
@@ -300,6 +291,7 @@ class AdminEventController {
   async show ({ request, response, auth }) {
     try {
       const { user } = request.all()
+      const page = request.input('page', 1)
       const adminID = auth.user.id
 
       const admin = await User
@@ -316,26 +308,15 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
-      let event = {}
-
-      event = await Event.query()
+      const event = await Event.query()
         .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
         .where({
           user_id: user
         })
         .orderBy('date', 'desc')
-        .fetch()
+        .paginate(page)
 
-      const eventJson = event.toJSON()[0]
-      if (!eventJson) {
-        return response
-          .status(204)
-          .send({ message: 'Não possui reservas.' })
-      }
-
-      return response
-        .status(200)
-        .send({ events: event })
+      return event
     } catch (error) {
       return response
         .status(error.status)
