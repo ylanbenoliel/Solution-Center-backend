@@ -61,8 +61,11 @@ Route.group(() => {
   Route.patch('admin/events/payment', 'AdminEventController.payment')
 }).middleware('auth')
 
-Route.resource('messages', 'MessageController')
-  .apiOnly().except(['show', 'update']).middleware('auth')
+Route.group(() => {
+  Route.get('/messages/:user', 'MessageController.index')
+  Route.post('/messages', 'MessageController.store')
+  Route.delete('/messages/:id', 'MessageController.delete')
+}).middleware('auth')
 
 Route.group(() => {
   Route.get('/plans', 'PlanController.index')

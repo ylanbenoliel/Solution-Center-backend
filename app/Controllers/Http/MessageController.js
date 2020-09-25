@@ -37,14 +37,14 @@ class MessageController {
    * @param {object} ctx
    * @param {Response} ctx.response
    */
-  async index ({ request, response, auth }) {
+  async index ({ params, request, response }) {
     try {
-      const userID = auth.user.id
+      const user = params.user
       const page = request.input('page', 1)
 
       const messages = await Message
         .query()
-        .where('user_id', userID)
+        .where('user_id', user)
         .orderBy('id', 'desc')
         .paginate(page)
 
