@@ -53,8 +53,7 @@ class AdminEventController {
 
       await Log.createMany(dataToStore)
     } catch (error) {
-      const errorData = new Date()
-      throw new Error(`Erro ao salvar registros. ${errorData}`)
+      throw new Error('Erro ao salvar registros.')
     }
   }
 
@@ -67,14 +66,9 @@ class AdminEventController {
     return ROOM_NAME[0]
   }
 
-  /**
- * @param {string} date
- * @returns {string} dateBars
- */
-  async dateWithBars (date) {
-    if (date.includes('T')) {
-      let dateWithTimeZone = await date.split('T')[0]
-      dateWithTimeZone = dateWithTimeZone.split('-').reverse().join('/')
+  dateWithBars (date) {
+    if (typeof date === 'object') {
+      const dateWithTimeZone = format(date, 'dd/MM/yyyy')
       return dateWithTimeZone
     }
     const dateBars = date.split('-').reverse().join('/')
@@ -388,7 +382,7 @@ class AdminEventController {
     try {
       const { id, status_payment } = request.all()
       const adminID = auth.user.id
-      const dateString = format(new Date(), 'yyyy-MM-dd')
+      // const dateString = format(new Date(), 'yyyy-MM-dd')
 
       const event = await Event.findOrFail(id)
       const { user_id, time, room } = event.toJSON()
@@ -402,8 +396,7 @@ class AdminEventController {
            'confirmou pagamento de ' +
            `${name}, ` +
            `Sala ${roomName}, ` +
-           `Dia ${this.dateWithBars(dateString)}, Hora ${time}`
-
+         `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
         this.writeLog(adminID, messageString)
 
         return response
@@ -415,7 +408,7 @@ class AdminEventController {
            'removeu pagamento de ' +
            `${name}, ` +
            `Sala ${roomName}, ` +
-           `Dia ${this.dateWithBars(dateString)}, Hora ${time}`
+           `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
 
         this.writeLog(adminID, messageString)
 
@@ -457,7 +450,7 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
       const event = await Event.findOrFail(eventID)
-      const { user_id, time, room } = event.toJSON()
+      const { user_id, time, room, date } = event.toJSON()
       const name = await this.getUserName(Number(user_id))
       const roomName = await this.roomName(Number(room))
 
@@ -469,7 +462,7 @@ class AdminEventController {
         'apagou reserva de ' +
         `${name}, ` +
         `Sala ${roomName}, ` +
-        // `Dia ${this.dateWithBars(date)}, `+
+        `Dia ${this.dateWithBars(date)}, ` +
         `Hora ${time}`
 
       this.writeLog(adminID, messageString)
