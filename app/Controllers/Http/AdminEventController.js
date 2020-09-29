@@ -23,29 +23,9 @@ const ROOM_DATA = [
 const Database = use('Database')
 const Event = use('App/Models/Event')
 const User = use('App/Models/User')
-const Log = use('App/Models/Log')
+const { writeLog } = require('../../Helpers/functions.js')
 
 class AdminEventController {
-  async writeLog (adminID, message) {
-    try {
-      const admin = await User
-        .query()
-        .select('name')
-        .where({
-          id: adminID
-        })
-        .fetch()
-
-      let adminName = admin.toJSON()[0]
-      adminName = adminName.name.split(' ')[0]
-      const data = `${adminName} ${message}`
-
-      await Log.create({ log: data })
-    } catch (error) {
-      throw new Error('Erro ao salvar registros.')
-    }
-  }
-
   roomName (roomId) {
     const ROOM_NAME = ROOM_DATA.map((room) => {
       if (room.id === roomId) {
@@ -251,7 +231,7 @@ class AdminEventController {
 
       const newEvent = await Event.create(data)
 
-      this.writeLog(adminID,
+      writeLog(adminID,
         `criou reserva para ${this.getUserName(user)}, Sala ${this.roomName(room)},` +
         ` Dia ${this.dateWithBars(date)}, Hora ${formattedTime}`)
 
@@ -386,7 +366,8 @@ class AdminEventController {
            `${name}, ` +
            `Sala ${roomName}, ` +
          `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
-        this.writeLog(adminID, messageString)
+
+        writeLog(adminID, messageString)
 
         return response
           .status(200)
@@ -399,7 +380,7 @@ class AdminEventController {
            `Sala ${roomName}, ` +
            `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
 
-        this.writeLog(adminID, messageString)
+        writeLog(adminID, messageString)
 
         return response
           .status(200)
@@ -454,7 +435,7 @@ class AdminEventController {
         `Dia ${this.dateWithBars(date)}, ` +
         `Hora ${time}`
 
-      this.writeLog(adminID, messageString)
+      writeLog(adminID, messageString)
 
       return response
         .status(200)
