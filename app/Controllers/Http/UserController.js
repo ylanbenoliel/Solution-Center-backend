@@ -56,6 +56,9 @@ class UserController {
     try {
       const user = await User.findOrFail(params.id)
       const data = request.all()
+      if (!data.password) {
+        delete data.password
+      }
       user.merge(data)
       await user.save()
       return response
