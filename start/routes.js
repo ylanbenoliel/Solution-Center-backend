@@ -62,7 +62,7 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.group(() => {
-  Route.get('/messages/:user', 'MessageController.index')
+  Route.get('/messages', 'MessageController.index')
   Route.post('/messages', 'MessageController.store')
   Route.delete('/messages/:id', 'MessageController.delete')
 }).middleware('auth')

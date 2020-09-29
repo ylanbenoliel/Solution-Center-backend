@@ -37,9 +37,9 @@ class MessageController {
    * @param {object} ctx
    * @param {Response} ctx.response
    */
-  async index ({ params, request, response }) {
+  async index ({ request, response, auth }) {
     try {
-      const user = params.user
+      const user = request.input('user', auth.user.id)
       const page = request.input('page', 1)
 
       const messages = await Message
