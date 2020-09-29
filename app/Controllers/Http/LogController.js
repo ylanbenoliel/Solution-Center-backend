@@ -18,13 +18,11 @@ class LogController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ request, response, auth }) {
+  async index ({ request, response }) {
     try {
       const page = request.input('page', 1)
-      const userID = auth.user.id
       const logs = await Log
         .query()
-        .where('user_id', userID)
         .orderBy('id', 'desc')
         .paginate(page)
 

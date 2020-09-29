@@ -38,20 +38,9 @@ class AdminEventController {
 
       let adminName = admin.toJSON()[0]
       adminName = adminName.name.split(' ')[0]
-      const messageString = `${adminName} ${message}`
+      const data = `${adminName} ${message}`
 
-      const allAdmins = await User
-        .query()
-        .select('id')
-        .where('is_admin', 1)
-        .fetch()
-
-      const adminArray = allAdmins.toJSON().flat(1)
-      const dataToStore = adminArray.map(adm => {
-        return { user_id: Object.values(adm), log: messageString }
-      })
-
-      await Log.createMany(dataToStore)
+      await Log.create({ log: data })
     } catch (error) {
       throw new Error('Erro ao salvar registros.')
     }
