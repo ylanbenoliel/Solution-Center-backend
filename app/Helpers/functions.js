@@ -3,7 +3,7 @@ const User = use('App/Models/User')
 
 async function writeLog (userID, message) {
   try {
-    const admin = await User
+    const user = await User
       .query()
       .select('name')
       .where({
@@ -11,7 +11,7 @@ async function writeLog (userID, message) {
       })
       .fetch()
 
-    let userName = admin.toJSON()[0]
+    let userName = user.toJSON()[0]
     userName = userName.name.split(' ')[0]
     const data = `${userName} ${message}`
 

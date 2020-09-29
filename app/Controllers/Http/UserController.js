@@ -3,32 +3,11 @@
 const Database = use('Database')
 const User = use('App/Models/User')
 const Plan = use('App/Models/Plan')
-const Log = use('App/Models/Log')
+
+const { writeLog } = require('../../Helpers/functions.js')
 class UserController {
   async createPlan (id) {
     await Plan.create({ user_id: id, plan: 1 })
-  }
-
-  async welcomeUser (name) {
-    try {
-      const admin = await User
-        .query()
-        .select('id')
-        .where('is_admin', 1)
-        .fetch()
-
-      const adminArray = admin.toJSON().flat(1)
-      const messageString = `Usuário ${name} se cadastrou.`
-
-      const dataToStore = adminArray.map(adm => {
-        return { user_id: Object.values(adm), log: messageString }
-      })
-
-      await Log.createMany(dataToStore)
-    } catch (error) {
-      const errorData = new Date()
-      throw new Error(`Erro ao enviar registro de novo usuário. ${errorData}`)
-    }
   }
 
   async store ({ request, response }) {
@@ -36,15 +15,18 @@ class UserController {
       const data = request.only([
         'name', 'email', 'rg', 'cpf', 'phone', 'password', 'address'
       ])
+
       const userExists = await User.findBy('email', data.email)
+
       if (userExists) {
         return response
           .status(400)
           .send({ message: 'Usuário já registrado!' })
       }
       const { id } = await User.create(data)
+
       this.createPlan(id)
-      this.welcomeUser(data.name)
+      writeLog(id, 'se cadastrou.')
 
       return { message: 'Usuário cadastrado.', id }
     } catch (error) {
