@@ -1,6 +1,5 @@
 'use strict'
 
-const Database = use('Database')
 const User = use('App/Models/User')
 const Notification = use('App/Models/Notification')
 
@@ -13,29 +12,6 @@ const Notification = use('App/Models/Notification')
  */
 class NotificationController {
   /**
-   * Show a list of all notifications.
-   * GET notifications
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async index ({ response }) {
-    try {
-      const users = await Database
-        .select('users.id', 'users.name', 'notifications.token')
-        .from('users')
-        .innerJoin('notifications', 'notifications.user_id', 'users.id')
-        .whereNotNull('token')
-      return users
-    } catch (error) {
-      return response
-        .status(error.status)
-        .send({ message: 'Não foi possível buscar os usuários.' })
-    }
-  }
-
-  /**
    * Create/save a new notification.
    * POST notifications
    *
@@ -43,42 +19,26 @@ class NotificationController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async storeOrUpdate ({ request, response }) {
     try {
       const { email, token } = request.all()
-      const user = await User.findByOrFail('email', email)
-      const notification = await Notification
-        .create({ user_id: user.id, token })
-      return notification
+
+      const user = await User.findBy('email', email)
+      const hasToken = await Notification.findBy('user_id', user.id)
+
+      if (!hasToken) {
+        await Notification
+          .create({ user_id: user.id, token })
+        return response.status(204).send()
+      }
+      hasToken.merge({ token: token })
+      await hasToken.save()
+
+      return response.status(204).send()
     } catch (error) {
       return response
         .status(error.status)
         .send({ message: 'Erro ao salvar token.' })
-    }
-  }
-
-  /**
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ request, response, auth }) {
-    try {
-      const userID = auth.user.id
-      const { token } = request.all()
-      const notification = await Notification.findByOrFail('user_id', userID)
-      notification.merge({ token })
-      await notification.save()
-      return response
-        .status(200)
-        .send({ message: 'Token atualizado.' })
-    } catch (error) {
-      return response
-        .status(error.status)
-        .send(
-          { message: 'Acesso inválido!' }
-        )
     }
   }
 }
