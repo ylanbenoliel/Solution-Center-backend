@@ -1,5 +1,7 @@
 'use strict'
 
+const { Expo } = require('expo-server-sdk')
+
 const Message = use('App/Models/Message')
 const Notification = use('App/Models/Notification')
 
@@ -26,8 +28,9 @@ class MessageController {
       }
       notificationTokens.push(pushToken.toJSON()[0].token)
     }
-    const toSend = { to: notificationTokens, ...body }
-    return toSend
+    const sendNotifications = { to: notificationTokens, sound: 'default', ...body }
+    if (!sendNotifications.to.length) return null
+    return sendNotifications
   }
 
   /**
@@ -73,8 +76,13 @@ class MessageController {
       const dataToStore = userArray.map(user => {
         return { user_id: user.user, message: messageString }
       })
-      // const whatTo = this.prepareNotifications(messageString, userArray)
-
+      const sendPushNotifications = await this.prepareNotifications(messageString, userArray)
+      const sendWithExpo = []
+      if (sendPushNotifications) {
+        const expo = new Expo()
+        sendWithExpo.push(sendPushNotifications)
+        await expo.sendPushNotificationsAsync(sendWithExpo)
+      }
       await Message.createMany(dataToStore)
       return response.status(200).send({ message: 'Mensagens salvas.' })
     } catch (error) {
