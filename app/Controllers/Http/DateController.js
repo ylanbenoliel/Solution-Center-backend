@@ -8,19 +8,20 @@ const {
   format,
   isAfter,
   parseISO,
-  isToday
+  isToday,
+  subHours
 } = require('date-fns')
 
 const Plan = use('App/Models/Plan')
 class DateController {
   async verifyEndOfPlan (userId) {
-    const currentDate = new Date()
+    const currentDate = subHours(new Date(), 3)
     const futureDate = addDays(currentDate, 30)
     try {
       const plan = await Plan.findBy('user_id', userId)
       if (Number(plan.plan) !== 1) {
         if (isToday(futureDate, parseISO(plan.updated_at)) ||
-            isAfter(futureDate, parseISO(plan.updated_at))) {
+        isAfter(futureDate, parseISO(plan.updated_at))) {
           plan.merge({ plan: 1 })
           await plan.save()
         }
