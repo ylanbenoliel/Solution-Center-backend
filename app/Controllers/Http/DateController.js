@@ -5,11 +5,31 @@ const {
   isFriday,
   isThursday,
   addDays,
-  format
+  format,
+  isAfter,
+  parseISO,
+  isToday
 } = require('date-fns')
 
 const Plan = use('App/Models/Plan')
 class DateController {
+  async verifyEndOfPlan (userId) {
+    const currentDate = new Date()
+    const futureDate = addDays(currentDate, 30)
+    try {
+      const plan = await Plan.findBy('user_id', userId)
+      if (Number(plan.plan) !== 1) {
+        if (isToday(futureDate, parseISO(plan.updated_at)) ||
+            isAfter(futureDate, parseISO(plan.updated_at))) {
+          plan.merge({ plan: 1 })
+          await plan.save()
+        }
+      }
+    } catch (error) {
+      throw new Error('Erro ao modificar usuário ' + userId + ' para hora avulsa')
+    }
+  }
+
   whichSaturday (day, func) {
     let dayReturn = {}
     if (func(day) || isSaturday(day)) {
@@ -23,12 +43,14 @@ class DateController {
 
   async show ({ response, auth }) {
     try {
+      const userID = auth.user.id
+      await this.verifyEndOfPlan(userID)
+
       const currentDate = new Date()
       const minDate = format(currentDate, 'yyyy-MM-dd')
       let maxDate = ''
       let saturday = null
 
-      const userID = auth.user.id
       const plan = await Plan.findBy('user_id', userID)
       const planJSON = plan.toJSON()
 
