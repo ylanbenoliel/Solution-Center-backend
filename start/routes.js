@@ -16,6 +16,8 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
+Route.get('/', () => 'Working...')
+
 Route.post('/users', 'UserController.store')
 
 Route.group(() => {
