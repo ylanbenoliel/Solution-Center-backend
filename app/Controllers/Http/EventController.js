@@ -7,7 +7,9 @@ const {
   formatDistance,
   isSameDay,
   isAfter,
-  isBefore
+  isBefore,
+  isPast,
+  subHours
 } = require('date-fns')
 
 const HOURS_SATURDAY = ['08', '09', '10', '11']
@@ -16,7 +18,6 @@ const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16
 const Database = use('Database')
 const Event = use('App/Models/Event')
 const User = use('App/Models/User')
-// const User = use('App/Models/User')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -31,7 +32,7 @@ class EventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ request, response, auth }) {
+  async schedule ({ request, response, auth }) {
     try {
       const { date, room } = request.all()
       const userID = auth.user.id
@@ -41,7 +42,6 @@ class EventController {
         return response.status(200).send({ active })
       }
 
-      let query = {}
       let hoursInterval = []
       const ISODate = parseISO(date)
 
@@ -51,80 +51,87 @@ class EventController {
         hoursInterval = HOURS_BUSINESS_DAYS
       }
 
-      if (room) {
-        query = await Database
-          .select('events.id as event',
-            'users.id as user',
-            'users.name',
-            'events.room',
-            'events.date',
-            'events.time')
-          .from('events')
-          .innerJoin('users', 'users.id', 'events.user_id')
-          .where({ date, room })
-      } else {
-        query = await Database
-          .select('events.id as event',
-            'users.id as user',
-            'users.name',
-            'events.room',
-            'events.date',
-            'events.time')
-          .from('events')
-          .innerJoin('users', 'users.id', 'events.user_id')
-          .where({ date })
-      }
+      const query = await Database
+        .select('events.id as event',
+          'users.id as user',
+          'users.name',
+          'events.room',
+          'events.date',
+          'events.time')
+        .from('events')
+        .innerJoin('users', 'users.id', 'events.user_id')
+        .where({ date, room })
 
-      if (query.length === 0) {
-        return response.status(200).send({
-          hoursInterval,
-          validEvents: query
-        })
-      }
+      const currentDate = subHours(new Date(), 3)
+      const validEvents = []
+      for (let i = 0; i < hoursInterval.length; i++) {
+        const hour = hoursInterval[i]
+        const hasEvent = query.find(event => event.time.includes(hour))
 
-      const currentDate = new Date(Date.now())
-      let code = ''
+        const hasNoEvent = {
+          event: Math.random(),
+          user: '',
+          room: room,
+          date: date,
+          time: `${hour}:00:00`
+        }
 
-      const validEvents = query.flatMap((event) => {
-        const dateString = format(event.date, 'yyyy-MM-dd')
-        const dateTimeString = `${dateString} ${event.time}`
-        const parsedDate = parseISO(dateTimeString)
-        if (isSameDay(parsedDate, currentDate) || isAfter(parsedDate, currentDate)) {
-          const dateTimeDistance = formatDistance(currentDate, parsedDate)
-          const distArray = dateTimeDistance.split(' ')
-          const timeDistArray = distArray.length === 2 ? distArray[0] : distArray[1]
+        if (!hasEvent) {
+          let noEvent = { ...hasNoEvent }
+          const dateTimeString = `${date} ${hour}`
+          const ISONoEventDate = subHours(parseISO(dateTimeString), 3)
 
-          // eslint-disable-next-line eqeqeq
-          if (userID != event.user) {
-            code = '4'
-            return {
-              ...event,
-              code
+          if (isPast(ISONoEventDate)) {
+            const code = '4'
+            noEvent = { ...noEvent, code }
+          }
+          if (isSameDay(ISONoEventDate, currentDate)) {
+            if ((ISONoEventDate.getHours() > currentDate.getHours())) {
+              const code = '1'
+              noEvent = { ...noEvent, code }
+            } else {
+              const code = '4'
+              noEvent = { ...noEvent, code }
             }
           }
-
-          if (isBefore(parsedDate, currentDate) ||
-          (dateTimeDistance.includes('min') ||
-          (dateTimeDistance.includes('hour') && timeDistArray < 6))) {
-            code = '3'
-            return {
-              ...event,
-              code
-            }
+          if (isAfter(ISONoEventDate, currentDate)) {
+            const code = '1'
+            noEvent = { ...noEvent, code }
           }
 
-          if (dateTimeDistance.includes('day') ||
-          (dateTimeDistance.includes('hour') && timeDistArray >= 6)) {
-            code = '2'
-            return {
-              ...event,
-              code
+          validEvents.push(noEvent)
+        } else {
+          const dateString = format(hasEvent.date, 'yyyy-MM-dd')
+          const dateTimeString = `${dateString} ${hasEvent.time}`
+          const parsedDate = subHours(parseISO(dateTimeString), 3)
+          if (isSameDay(parsedDate, currentDate) || isAfter(parsedDate, currentDate)) {
+            const dateTimeDistance = formatDistance(currentDate, parsedDate)
+            const distArray = dateTimeDistance.split(' ')
+            const timeDistArray = distArray.length === 2 ? distArray[0] : distArray[1]
+
+            if (Number(userID) !== Number(hasEvent.user)) {
+              const code = '4'
+              validEvents.push({ ...hasEvent, code })
+              continue
+            }
+
+            if (isBefore(parsedDate, currentDate) ||
+            (dateTimeDistance.includes('min') ||
+              (dateTimeDistance.includes('hour') && timeDistArray < 6))) {
+              const code = '3'
+              validEvents.push({ ...hasEvent, code })
+              continue
+            }
+
+            if (dateTimeDistance.includes('day') ||
+            (dateTimeDistance.includes('hour') && timeDistArray >= 6)) {
+              const code = '2'
+              validEvents.push({ ...hasEvent, code })
+              continue
             }
           }
         }
-
-        return event
-      })
+      }
 
       return response.status(200).send({
         hoursInterval,
@@ -138,10 +145,10 @@ class EventController {
   }
 
   /**
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
+ * @param {object} ctx
+ * @param {Request} ctx.request
+ * @param {Response} ctx.response
+ */
   async store ({ request, response, auth }) {
     try {
       const { room, date, time } = request.all()
@@ -167,10 +174,10 @@ class EventController {
   }
 
   /**
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
+ * @param {object} ctx
+ * @param {Request} ctx.request
+ * @param {Response} ctx.response
+ */
   async show ({ request, response, auth }) {
     try {
       const userID = auth.user.id
@@ -190,10 +197,10 @@ class EventController {
   }
 
   /**
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
+ * @param {object} ctx
+ * @param {Request} ctx.request
+ * @param {Response} ctx.response
+ */
   async update ({ response, request, auth }) {
     try {
       const userID = auth.user.id
@@ -227,13 +234,13 @@ class EventController {
   }
 
   /**
-   * Delete a event with id.
-   * DELETE events/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
+ * Delete a event with id.
+ * DELETE events/:id
+ *
+ * @param {object} ctx
+ * @param {Request} ctx.request
+ * @param {Response} ctx.response
+ */
   async destroy ({ params, response, auth }) {
     try {
       const eventID = params.id

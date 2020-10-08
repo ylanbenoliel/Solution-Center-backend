@@ -36,7 +36,7 @@ Route.put('images', 'ImageController.update').middleware('auth')
 
 Route.group(() => {
   Route.post('/events/new', 'EventController.store')
-  Route.post('/events/list', 'EventController.index')
+  Route.post('/events/list', 'EventController.schedule')
   Route.get('/events/list/user', 'EventController.show')
   Route.delete('/events/:id', 'EventController.destroy')
   Route.patch('/events/update', 'EventController.update')
