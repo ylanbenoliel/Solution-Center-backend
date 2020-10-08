@@ -230,9 +230,9 @@ class AdminEventController {
       }
 
       const newEvent = await Event.create(data)
-
+      const name = await this.getUserName(Number(user))
       writeLog(adminID,
-        `criou reserva para ${this.getUserName(user)}, Sala ${this.roomName(room)},` +
+        `criou reserva para ${name}, Sala ${this.roomName(room)},` +
         ` Dia ${this.dateWithBars(date)}, Hora ${formattedTime}`)
 
       return response.status(200).send({
