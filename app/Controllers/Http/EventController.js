@@ -75,6 +75,13 @@ class EventController {
           .where({ date })
       }
 
+      if (query.length === 0) {
+        return response.status(200).send({
+          hoursInterval,
+          validEvents: query
+        })
+      }
+
       const currentDate = new Date(Date.now())
       let code = ''
 
