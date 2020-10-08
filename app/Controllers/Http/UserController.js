@@ -97,9 +97,15 @@ class UserController {
         .innerJoin('events', 'users.id', 'events.user_id')
         .where({ 'events.status_payment': false })
 
-      const idsArray = query.map((id) => {
-        return Object.values(id)
-      }).flat(1)
+      const idsArray = []
+
+      if (!query.length) {
+        return { ids: idsArray }
+      }
+      for (let i = 0; i < query.length; i++) {
+        const { id } = query[i]
+        idsArray.push(id)
+      }
       return { ids: idsArray }
     } catch (error) {
       return response
