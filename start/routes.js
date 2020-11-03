@@ -18,6 +18,10 @@ const Route = use('Route')
 
 Route.get('/', () => 'Working...')
 
+Route.get('/privacy', ({ view }) => {
+  return view.render('privacy')
+})
+
 Route.post('/users', 'UserController.store')
 
 Route.group(() => {
