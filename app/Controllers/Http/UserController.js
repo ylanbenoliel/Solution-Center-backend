@@ -1,5 +1,10 @@
 'use strict'
 
+const crypto = require('crypto')
+const seedrandom = require('seedrandom')
+
+const Mail = use('Mail')
+const Env = use('Env')
 const Database = use('Database')
 const User = use('App/Models/User')
 const Plan = use('App/Models/Plan')
@@ -111,6 +116,29 @@ class UserController {
       return response
         .status(error.status)
         .send({ message: 'Erro ao buscar pendências.' })
+    }
+  }
+
+  async forgot ({ request, response }) {
+    try {
+      const { email } = request.only(['email'])
+      const user = await User.findByOrFail('email', email)
+
+      const rng = seedrandom(crypto.randomBytes(64).toString('base64'))
+      const code = (rng()).toString().substring(3, 9)
+
+      Mail.send('emails.recover', { user, code }, (message) => {
+        message
+          .from(Env.get('MAIL_USERNAME'))
+          .subject('Recuperação de senha.')
+          .to(email)
+      })
+
+      return response.ok('Token de recuperação enviado.')
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Email não encontrado.', error: error })
     }
   }
 }

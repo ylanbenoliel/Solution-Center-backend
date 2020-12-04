@@ -23,6 +23,7 @@ Route.get('/privacy', ({ view }) => {
 })
 
 Route.post('/users', 'UserController.store')
+Route.post('forgot-password', 'UserController.forgot')
 
 Route.group(() => {
   Route.get('/user/details', 'UserController.show')
