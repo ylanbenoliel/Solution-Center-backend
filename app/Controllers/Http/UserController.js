@@ -127,6 +127,10 @@ class UserController {
       const rng = seedrandom(crypto.randomBytes(64).toString('base64'))
       const code = (rng()).toString().substring(3, 9)
 
+      user.passwd_token = code
+      user.passwd_token_cr_at = new Date()
+      await user.save()
+
       Mail.send('emails.recover', { user, code }, (message) => {
         message
           .from(Env.get('MAIL_USERNAME'))
