@@ -25,9 +25,9 @@ Route.get('/privacy', ({ view }) => {
 Route.post('/users', 'UserController.store')
 
 Route.group(() => {
-  Route.post('/forgot-password', 'UserController.forgot')
-  Route.post('/verify-reset-code', 'UserController.verifyPasswordToken')
-  Route.patch('/password', 'UserController.updatePassword')
+  Route.get('/forgot-password/:email', 'ForgotPasswordController.store')
+  Route.post('/verify-reset-code', 'ForgotPasswordController.show')
+  Route.patch('/password', 'ForgotPasswordController.update')
 })
 
 Route.group(() => {
