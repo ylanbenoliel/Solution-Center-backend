@@ -2,7 +2,7 @@
 
 const crypto = require('crypto')
 const seedrandom = require('seedrandom')
-const { isAfter, addMinutes } = require('date-fns')
+const { isAfter, addMinutes, format } = require('date-fns')
 
 const Mail = use('Mail')
 const Env = use('Env')
@@ -22,12 +22,14 @@ class ForgotPasswordController {
       user.passwd_token_cr_at = new Date()
       await user.save()
 
-      Mail.send('emails.recover', { user, code }, (message) => {
-        message
-          .from(Env.get('MAIL_USERNAME'))
-          .subject('Recuperação de senha.')
-          .to(email)
-      })
+      const currentDateTimeFormatted = format(new Date(), "dd'/'MM'/'yyyy 'às' HH:mm")
+      Mail.send('emails.recover', { user, code, dt: currentDateTimeFormatted },
+        (message) => {
+          message
+            .from(Env.get('MAIL_USERNAME'))
+            .subject('Recuperação de senha.')
+            .to(email)
+        })
 
       return response
         .status(200)
