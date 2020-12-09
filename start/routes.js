@@ -23,7 +23,8 @@ Route.get('/privacy', ({ view }) => {
 })
 
 Route.post('/users', 'UserController.store')
-Route.post('forgot-password', 'UserController.forgot')
+Route.post('/forgot-password', 'UserController.forgot')
+Route.post('/verify-reset-code', 'UserController.verifyPasswordToken')
 
 Route.group(() => {
   Route.get('/user/details', 'UserController.show')
