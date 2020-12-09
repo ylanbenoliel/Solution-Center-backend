@@ -175,6 +175,33 @@ class UserController {
         .send({ message: 'Email não encontrado.' })
     }
   }
+
+  async updatePassword ({ request, response }) {
+    try {
+      const { email, password } = request.only(['email', 'password'])
+
+      const user = await User.findByOrFail('email', email)
+
+      if (!password || password.length < 8) {
+        return response
+          .status(400)
+          .send({ message: 'Senha menor que 8 caracteres.' })
+      }
+
+      user.passwd_token_cr_at = null
+      user.passwd_token = null
+      user.password = password
+      await user.save()
+
+      return response
+        .status(200)
+        .send({ message: 'Senha atualizada.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível atualizar a senha.' })
+    }
+  }
 }
 
 module.exports = UserController
