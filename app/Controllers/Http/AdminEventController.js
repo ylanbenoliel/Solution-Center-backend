@@ -363,13 +363,12 @@ class AdminEventController {
       await event.merge({ status_payment: status_payment })
       await event.save()
       const name = await this.getUserName(Number(user_id))
-      const roomName = await this.roomName(Number(room))
 
       if (status_payment === 1) {
         const messageString =
            'confirmou pagamento de ' +
            `${name}, ` +
-           `Sala ${roomName}, ` +
+           `Sala ${this.roomName(room)} ` +
          `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
 
         writeLog(adminID, messageString)
@@ -382,7 +381,7 @@ class AdminEventController {
         const messageString =
            'removeu pagamento de ' +
            `${name}, ` +
-           `Sala ${roomName}, ` +
+           `Sala ${this.roomName(room)}, ` +
            `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
 
         writeLog(adminID, messageString)
@@ -427,7 +426,6 @@ class AdminEventController {
       const event = await Event.findOrFail(eventID)
       const { user_id, time, room, date } = event.toJSON()
       const name = await this.getUserName(Number(user_id))
-      const roomName = await this.roomName(Number(room))
 
       await Event.query()
         .where({ id: eventID })
@@ -436,7 +434,7 @@ class AdminEventController {
       const messageString =
         'apagou reserva de ' +
         `${name}, ` +
-        `Sala ${roomName}, ` +
+        `Sala ${this.roomName(room)}, ` +
         `Dia ${this.dateWithBars(date)}, ` +
         `Hora ${time}`
 
