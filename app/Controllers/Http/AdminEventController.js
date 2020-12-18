@@ -172,15 +172,19 @@ class AdminEventController {
             }
             rawEvents.push(hasNoEvent)
           } else {
+            const nameSplited = hasEvent.name.split(' ')
+            const lastNameLetter = nameSplited[nameSplited.length - 1].charAt(0)
+            const firstNameAndLastNameWithDot = `${nameSplited[0]} ${lastNameLetter}.`
+
             const userHasEvent = {
               index,
               ...hasEvent,
               date: date,
-              room: room
+              room: room,
+              name: firstNameAndLastNameWithDot
             }
             rawEvents.push(userHasEvent)
           }
-
           index++
         }
       }
