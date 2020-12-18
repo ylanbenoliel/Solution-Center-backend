@@ -5,6 +5,7 @@
   "description": "Solution Center backend",
   "main": "index.js",
   "scripts": {
+    "prestart": "npm i",
     "start": "node server.js",
     "test": "node ace test"
   },
