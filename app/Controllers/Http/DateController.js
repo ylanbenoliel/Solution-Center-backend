@@ -8,7 +8,7 @@ const {
   format,
   isAfter,
   parseISO,
-  isToday,
+  isSameDay,
   subHours
 } = require('date-fns')
 
@@ -20,7 +20,7 @@ class DateController {
     try {
       const plan = await Plan.findBy('user_id', userId)
       if (Number(plan.plan) !== 1) {
-        if (isToday(futureDate, parseISO(plan.updated_at)) ||
+        if (isSameDay(futureDate, parseISO(plan.updated_at)) ||
         isAfter(futureDate, parseISO(plan.updated_at))) {
           plan.merge({ plan: 1 })
           await plan.save()
