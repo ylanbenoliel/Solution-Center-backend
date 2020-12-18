@@ -6,8 +6,7 @@ const {
   format,
   formatDistance,
   isSameDay,
-  isAfter,
-  isBefore,
+  isFuture,
   isPast,
   subHours
 } = require('date-fns')
@@ -65,6 +64,11 @@ class EventController {
       const currentDate = subHours(new Date(), 3)
       const validEvents = []
       for (let i = 0; i < hoursInterval.length; i++) {
+      // 1 - horário vago,
+      // 2 - horário do usuário,
+      // 3 - horário do usuário que não pode ser desmarcado,
+      // 4 - horário indisponivel,
+
         const hour = hoursInterval[i]
         const hasEvent = query.find(event => event.time.includes(hour))
 
@@ -94,41 +98,53 @@ class EventController {
               noEvent = { ...noEvent, code }
             }
           }
-          if (isAfter(ISONoEventDate, currentDate)) {
+          if (isFuture(ISONoEventDate)) {
             const code = '1'
             noEvent = { ...noEvent, code }
           }
 
           validEvents.push(noEvent)
         } else {
+          if (Number(userID) !== Number(hasEvent.user)) {
+            const code = '4'
+            validEvents.push({ ...hasEvent, code })
+            continue
+          }
+
           const dateString = format(hasEvent.date, 'yyyy-MM-dd')
           const dateTimeString = `${dateString} ${hasEvent.time}`
           const parsedDate = subHours(parseISO(dateTimeString), 3)
-          if (isSameDay(parsedDate, currentDate) || isAfter(parsedDate, currentDate)) {
-            const dateTimeDistance = formatDistance(currentDate, parsedDate)
-            const distArray = dateTimeDistance.split(' ')
-            const timeDistArray = distArray.length === 2 ? distArray[0] : distArray[1]
+          const dateTimeDistance = formatDistance(currentDate, parsedDate)
+          const distArray = dateTimeDistance.split(' ')
+          const timeDistArray = distArray.length === 2 ? distArray[0] : distArray[1]
 
-            if (Number(userID) !== Number(hasEvent.user)) {
-              const code = '4'
-              validEvents.push({ ...hasEvent, code })
-              continue
-            }
+          const dateTimeDistanceIsHourAndBelowSix =
+          dateTimeDistance.includes('hour') && timeDistArray < 6
 
-            if (isBefore(parsedDate, currentDate) ||
-            (dateTimeDistance.includes('min') ||
-              (dateTimeDistance.includes('hour') && timeDistArray < 6))) {
-              const code = '3'
-              validEvents.push({ ...hasEvent, code })
-              continue
+          if (isPast(parsedDate)) {
+            const code = '3'
+            validEvents.push({ ...hasEvent, code })
+            continue
+          }
+          if (isSameDay(parsedDate, currentDate)) {
+            let localCode = ''
+            if (dateTimeDistance.includes('min') || dateTimeDistanceIsHourAndBelowSix) {
+              localCode = '3'
+            } else {
+              localCode = '2'
             }
-
-            if (dateTimeDistance.includes('day') ||
-            (dateTimeDistance.includes('hour') && timeDistArray >= 6)) {
-              const code = '2'
-              validEvents.push({ ...hasEvent, code })
-              continue
+            validEvents.push({ ...hasEvent, code: localCode })
+            continue
+          }
+          if (isFuture(parsedDate)) {
+            let localCode = ''
+            if (dateTimeDistanceIsHourAndBelowSix) {
+              localCode = '3'
+            } else {
+              localCode = '2'
             }
+            validEvents.push({ ...hasEvent, code: localCode })
+            continue
           }
         }
       }
