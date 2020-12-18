@@ -27,12 +27,12 @@ const { writeLog } = require('../../Helpers/functions.js')
 
 class AdminEventController {
   roomName (roomId) {
-    const ROOM_NAME = ROOM_DATA.map((room) => {
+    const ROOM_NAME = ROOM_DATA.find((room) => {
       if (room.id === roomId) {
-        return room.name.split(' ')[0]
+        return room.name
       } return false
-    }).filter((room) => room)
-    return ROOM_NAME[0]
+    })
+    return ROOM_NAME.name.split(' ')[0]
   }
 
   dateWithBars (date) {
@@ -235,6 +235,7 @@ class AdminEventController {
 
       const newEvent = await Event.create(data)
       const name = await this.getUserName(Number(user))
+
       writeLog(adminID,
         `criou reserva para ${name}, Sala ${this.roomName(room)},` +
         ` Dia ${this.dateWithBars(date)}, Hora ${formattedTime}`)
