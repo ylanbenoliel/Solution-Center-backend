@@ -89,6 +89,7 @@ class UserController {
   }
 
   async debt ({ response }) {
+    const currentDate = new Date()
     try {
       const query = await Database
         .select('users.id')
@@ -96,6 +97,8 @@ class UserController {
         .from('users')
         .innerJoin('events', 'users.id', 'events.user_id')
         .where({ 'events.status_payment': false })
+        .andWhere('events.date', '<', currentDate)
+        .orderBy('users.id')
 
       const idsArray = []
 
