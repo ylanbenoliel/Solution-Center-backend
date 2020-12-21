@@ -171,17 +171,31 @@ class EventController {
       const userID = auth.user.id
       const formattedTime = `${time.split(':')[0]}:00:00`
 
+      const userEventInSameDateTime = await Event
+        .query()
+        .where({
+          user_id: userID,
+          date: date,
+          time: formattedTime
+        })
+        .fetch()
+      if (userEventInSameDateTime.rows.length !== 0) {
+        return response
+          .status(406)
+          .send({ message: 'Duas salas no mesmo horário!' })
+      }
+
       const data = {
         user_id: userID,
         room,
         date,
         time: formattedTime
       }
-
       const newEvent = await Event.create(data)
-      return response.status(200).send(
-        { message: 'Horário salvo!', event: newEvent }
-      )
+
+      return response
+        .status(200)
+        .send({ message: 'Horário salvo!', event: newEvent })
     } catch (error) {
       return response
         .status(error.status)
