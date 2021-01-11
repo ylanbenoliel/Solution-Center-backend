@@ -13,7 +13,7 @@ class ImageController {
       const avatarPic = request.file('avatar',
         {
           types: ['image'],
-          size: '2mb'
+          size: '5mb'
         }
       )
 
@@ -44,7 +44,7 @@ class ImageController {
       const avatarPic = request.file('avatar',
         {
           types: ['image'],
-          size: '2mb'
+          size: '5mb'
         }
       )
       const dbPic = await Database
