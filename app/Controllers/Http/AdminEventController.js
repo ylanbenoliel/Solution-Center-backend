@@ -65,7 +65,7 @@ class AdminEventController {
 
   async eventsWithDebt ({ request, response, auth }) {
     try {
-      const { date, user } = request.all()
+      const { user } = request.all()
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
@@ -85,26 +85,14 @@ class AdminEventController {
 
       let event = {}
 
-      if (date) {
-        event = await Event.query()
-          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
-          .where({
-            date,
-            user_id: user,
-            status_payment: 0
-          })
-          .orderBy('date', 'desc')
-          .paginate(page)
-      } else {
-        event = await Event.query()
-          .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
-          .where({
-            user_id: user,
-            status_payment: 0
-          })
-          .orderBy('date', 'desc')
-          .paginate(page)
-      }
+      event = await Event.query()
+        .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+        .where({
+          user_id: user,
+          status_payment: 0
+        })
+        .orderBy('date', 'desc')
+        .paginate(page)
 
       return event
     } catch (error) {
