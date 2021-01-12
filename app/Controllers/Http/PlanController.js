@@ -55,17 +55,6 @@ class PlanController {
         .send({ message: 'Erro ao editar planos do usuário.' })
     }
   }
-
-  /**
-   * Delete a plan with id.
-   * DELETE plans/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
-  }
 }
 
 module.exports = PlanController
