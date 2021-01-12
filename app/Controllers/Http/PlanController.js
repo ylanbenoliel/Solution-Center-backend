@@ -1,5 +1,7 @@
 'use strict'
 
+const { addDays, parseISO } = require('date-fns')
+
 const Plan = use('App/Models/Plan')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -9,6 +11,12 @@ const Plan = use('App/Models/Plan')
  * Resourceful controller for interacting with plans
  */
 class PlanController {
+  expiresAt (dateString) {
+    const dateObject = parseISO(dateString)
+    const expireAt = addDays(dateObject, 30)
+    return expireAt
+  }
+
   /**
    *
    * @param {object} ctx
@@ -17,13 +25,23 @@ class PlanController {
   async show ({ params, response }) {
     try {
       const userID = params.user
-      const plans = await Plan
+      let expireDatePlan = null
+
+      const plan = await Plan
         .query()
-        .select('plan')
+        .select('plan', 'updated_at')
         .where({ user_id: userID })
         .fetch()
 
-      return plans.toJSON()[0]
+      const planJSON = plan.toJSON()[0]
+      if (planJSON.plan !== '1') {
+        expireDatePlan = this.expiresAt(planJSON.updated_at)
+      }
+
+      const planNumber = planJSON.plan
+      const dataToResponse = { plan: planNumber, expires: expireDatePlan }
+
+      return dataToResponse
     } catch (error) {
       return response
         .status(error.status)
