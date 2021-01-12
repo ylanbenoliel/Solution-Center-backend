@@ -10,30 +10,6 @@ const Plan = use('App/Models/Plan')
  */
 class PlanController {
   /**
-   * Show a list of all plans.
-   * GET plans
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async index ({ response, auth }) {
-    try {
-      const userID = auth.user.id
-      const plans = await Plan.findByOrFail(
-        { user_id: userID }
-      )
-      return plans
-    } catch (error) {
-      return response
-        .status(error.status)
-        .send({ message: 'Erro ao buscar planos.' })
-    }
-  }
-
-  // #FIXME remove create feature in show
-
-  /**
    *
    * @param {object} ctx
    * @param {Response} ctx.response
