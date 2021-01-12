@@ -17,6 +17,15 @@ class User extends Model {
     })
   }
 
+  static get computed () {
+    return ['listname']
+  }
+
+  getListname ({ name }) {
+    const nameSplit = name.split(' ')
+    return `${nameSplit[0]} ${nameSplit[nameSplit.length - 1]}`
+  }
+
   /**
    * A relationship on tokens is required for auth to
    * work. Since features like `refreshTokens` or
