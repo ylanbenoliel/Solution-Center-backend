@@ -1,8 +1,8 @@
 const HOURS_ADMIN_SATURDAY = ['08', '09', '10', '11', '12', '13']
 const HOURS_ADMIN_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
 
-const HOURS_USER_SATURDAY = HOURS_ADMIN_SATURDAY.splice(-2, 2)
-const HOURS_USER_BUSINESS_DAYS = HOURS_ADMIN_BUSINESS_DAYS.splice(-2, 2)
+const HOURS_USER_SATURDAY = HOURS_ADMIN_SATURDAY.slice(0, -2)
+const HOURS_USER_BUSINESS_DAYS = HOURS_ADMIN_BUSINESS_DAYS.slice(0, -2)
 
 const ROOM_DATA = [
   { id: 1, name: 'Clarice Lispector' },
