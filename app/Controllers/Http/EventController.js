@@ -14,7 +14,8 @@ const { timeToSaveInDatabase } = require('../../Helpers/functions')
 
 const {
   HOURS_USER_BUSINESS_DAYS,
-  HOURS_USER_SATURDAY
+  HOURS_USER_SATURDAY,
+  ROOM_DATA
 } = require('../../Helpers/constants')
 
 const Database = use('Database')
@@ -29,6 +30,15 @@ const User = use('App/Models/User')
  * Resourceful controller for interacting with events
  */
 class EventController {
+  roomName (roomId) {
+    const ROOM_NAME = ROOM_DATA.find((room) => {
+      if (room.id === Number(roomId)) {
+        return room.name
+      } return false
+    })
+    return ROOM_NAME.name.split(' ')[0]
+  }
+
   /**
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -184,9 +194,11 @@ class EventController {
         })
         .fetch()
       if (userEventInSameDateTime.rows.length !== 0) {
+        const eventJson = userEventInSameDateTime.toJSON()[0]
+        const localRoom = this.roomName(eventJson.room)
         return response
           .status(406)
-          .send({ message: 'Duas salas no mesmo horário!' })
+          .send({ message: `Você tem o mesmo horário na sala ${localRoom}.` })
       }
 
       const data = {
