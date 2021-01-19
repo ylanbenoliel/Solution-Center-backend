@@ -395,38 +395,23 @@ class AdminEventController {
    */
   async destroy ({ params, response, auth }) {
     try {
-      const eventID = params.id
+      const id = Number(params.id)
       const adminID = auth.user.id
 
-      const admin = await User
-        .query()
-        .select('id')
-        .where({
-          id: adminID,
-          is_admin: 1
-        })
-        .fetch()
-
-      const JSONAdmin = admin.toJSON()[0]
-      if (!JSONAdmin) {
+      const admin = await User.find(adminID)
+      if (admin.is_admin !== 1) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
-      const event = await Event.findOrFail(eventID)
-      const { user_id, time, room, date } = event.toJSON()
-      const name = await this.getUserName(Number(user_id))
 
-      await Event.query()
-        .where({ id: eventID })
-        .delete()
+      const event = await Event.find(id)
 
-      const messageString =
-        'apagou reserva de ' +
-        `${name}, ` +
-        `Sala ${this.roomName(room)}, ` +
-        `Dia ${this.dateWithBars(date)}, ` +
-        `Hora ${time}`
+      const hasEvent = !!event
+      if (!hasEvent) {
+        return response.status(404).send({ message: 'Evento não encontrado.' })
+      }
 
-      writeLog(adminID, messageString)
+      const eventToDelete = await Event.findOrFail(id)
+      await eventToDelete.delete()
 
       return response
         .status(200)
