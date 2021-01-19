@@ -21,4 +21,13 @@ async function writeLog (userID, message) {
   }
 }
 
-module.exports = { writeLog }
+/**
+ * @param {string} time
+ * @returns {string} formattedTime
+ */
+function timeToSaveInDatabase (time) {
+  const formattedTime = `${time.split(':')[0]}:00:00`
+  return formattedTime
+}
+
+module.exports = { writeLog, timeToSaveInDatabase }

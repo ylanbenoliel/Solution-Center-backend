@@ -23,7 +23,7 @@ const ROOM_DATA = [
 const Database = use('Database')
 const Event = use('App/Models/Event')
 const User = use('App/Models/User')
-const { writeLog } = require('../../Helpers/functions.js')
+const { writeLog, timeToSaveInDatabase } = require('../../Helpers/functions.js')
 
 class AdminEventController {
   roomName (roomId) {
@@ -201,10 +201,12 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
+      const formattedTime = timeToSaveInDatabase(time)
+
       const event = await Event
         .query()
         .where({
-          date, time, room
+          date, time: formattedTime, room
         })
         .fetch()
 
@@ -214,8 +216,6 @@ class AdminEventController {
         return response.status(406)
           .send({ message: 'Já existe reserva nesse horário.' })
       }
-
-      const formattedTime = `${time.split(':')[0]}:00:00`
 
       const data = {
         user_id: user,
@@ -292,7 +292,8 @@ class AdminEventController {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
-      const formattedTime = `${data.time.split(':')[0]}:00:00`
+      const formattedTime = timeToSaveInDatabase(data.time)
+      // const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const evt = await Event
         .query()
@@ -327,7 +328,6 @@ class AdminEventController {
     try {
       const { id, status_payment } = request.all()
       const adminID = auth.user.id
-      // const dateString = format(new Date(), 'yyyy-MM-dd')
 
       const event = await Event.findOrFail(id)
       const { user_id, time, room } = event.toJSON()

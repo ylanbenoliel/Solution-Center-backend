@@ -10,6 +10,7 @@ const {
   isPast,
   subHours
 } = require('date-fns')
+const { timeToSaveInDatabase } = require('../../Helpers/functions')
 
 const HOURS_SATURDAY = ['08', '09', '10', '11']
 const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
@@ -169,7 +170,8 @@ class EventController {
     try {
       const { room, date, time } = request.all()
       const userID = auth.user.id
-      const formattedTime = `${time.split(':')[0]}:00:00`
+
+      const formattedTime = timeToSaveInDatabase(time)
 
       const userEventInSameDateTime = await Event
         .query()
