@@ -46,6 +46,15 @@ class AdminEventController {
 
   /**
  * @param {number} userId
+ * @returns {boolean} admin
+ */
+  async userIsAdmin (userId) {
+    const user = await User.findOrFail(userId)
+    return !!user.is_admin
+  }
+
+  /**
+ * @param {number} userId
  * @returns {string} userName
  */
   async getUserName (userId) {
@@ -69,17 +78,7 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      const admin = await User
-        .query()
-        .select('name')
-        .where({
-          id: adminID,
-          is_admin: 1
-        })
-        .fetch()
-
-      const JSONAdmin = admin.toJSON()[0]
-      if (!JSONAdmin) {
+      if (this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -198,6 +197,10 @@ class AdminEventController {
       const { user, date, time, room } = request.all()
       const adminID = auth.user.id
 
+      if (this.userIsAdmin(adminID)) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
+
       const event = await Event
         .query()
         .where({
@@ -250,17 +253,7 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      const admin = await User
-        .query()
-        .select('name')
-        .where({
-          id: adminID,
-          is_admin: 1
-        })
-        .fetch()
-
-      const JSONAdmin = admin.toJSON()[0]
-      if (!JSONAdmin) {
+      if (this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -295,21 +288,11 @@ class AdminEventController {
         'time'
       ])
 
-      const formattedTime = `${data.time.split(':')[0]}:00:00`
-
-      const admin = await User
-        .query()
-        .select('name')
-        .where({
-          id: adminID,
-          is_admin: 1
-        })
-        .fetch()
-
-      const JSONAdmin = admin.toJSON()[0]
-      if (!JSONAdmin) {
+      if (this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
+
+      const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const evt = await Event
         .query()
@@ -398,8 +381,7 @@ class AdminEventController {
       const id = Number(params.id)
       const adminID = auth.user.id
 
-      const admin = await User.find(adminID)
-      if (admin.is_admin !== 1) {
+      if (this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
