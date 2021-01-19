@@ -19,10 +19,12 @@ class DateController {
     const futureDate = addDays(currentDate, 30)
     try {
       const plan = await Plan.findBy('user_id', userId)
-      if (Number(plan.plan) !== 1) {
-        if (isSameDay(futureDate, parseISO(plan.updated_at)) ||
-        isAfter(futureDate, parseISO(plan.updated_at))) {
-          plan.merge({ plan: 1 })
+      if (plan.plan !== '1') {
+        if (
+          isSameDay(futureDate, parseISO(plan.updated_at)) ||
+        isAfter(futureDate, parseISO(plan.updated_at))
+        ) {
+          plan.merge({ plan: '1' })
           await plan.save()
         }
       }
@@ -42,9 +44,9 @@ class DateController {
     return dayReturn
   }
 
-  async show ({ response, auth }) {
+  async show ({ request, response, auth }) {
     try {
-      const userID = auth.user.id
+      const userID = request.input('user', auth.user.id)
       await this.verifyEndOfPlan(userID)
 
       const currentDate = new Date()
@@ -55,7 +57,7 @@ class DateController {
       const plan = await Plan.findBy('user_id', userID)
       const planJSON = plan.toJSON()
 
-      if (Number(planJSON.plan) !== 1) {
+      if (planJSON.plan !== '1') {
         maxDate = addDays(new Date(planJSON.updated_at), 30)
         saturday = this.whichSaturday(maxDate, isThursday)
       } else {
