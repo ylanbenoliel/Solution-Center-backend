@@ -6,19 +6,11 @@ const {
   format
 } = require('date-fns')
 
-const HOURS_SATURDAY = ['08', '09', '10', '11', '12', '13']
-const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
-const ROOM_DATA = [
-  { id: 1, name: 'Clarice Lispector' },
-  { id: 2, name: 'Carlos Drummond de Andrade' },
-  { id: 3, name: 'Cecília Meireles' },
-  { id: 4, name: 'Rui Barbosa' },
-  { id: 5, name: 'Machado de Assis' },
-  { id: 6, name: 'Monteiro Lobato' },
-  { id: 7, name: 'Luís Fernando Veríssimo' },
-  { id: 8, name: 'Cora Coralina' },
-  { id: 9, name: 'Carolina de Jesus' }
-]
+const {
+  HOURS_ADMIN_SATURDAY,
+  HOURS_ADMIN_BUSINESS_DAYS,
+  ROOM_DATA
+} = require('../../Helpers/constants')
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
@@ -116,9 +108,9 @@ class AdminEventController {
       const ISODate = parseISO(date)
 
       if (isSaturday(ISODate)) {
-        hoursInterval = HOURS_SATURDAY
+        hoursInterval = HOURS_ADMIN_SATURDAY
       } else {
-        hoursInterval = HOURS_BUSINESS_DAYS
+        hoursInterval = HOURS_ADMIN_BUSINESS_DAYS
       }
 
       query = await Database

@@ -12,8 +12,10 @@ const {
 } = require('date-fns')
 const { timeToSaveInDatabase } = require('../../Helpers/functions')
 
-const HOURS_SATURDAY = ['08', '09', '10', '11']
-const HOURS_BUSINESS_DAYS = ['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
+const {
+  HOURS_USER_BUSINESS_DAYS,
+  HOURS_USER_SATURDAY
+} = require('../../Helpers/constants')
 
 const Database = use('Database')
 const Event = use('App/Models/Event')
@@ -46,9 +48,9 @@ class EventController {
       const ISODate = parseISO(date)
 
       if (isSaturday(ISODate)) {
-        hoursInterval = HOURS_SATURDAY
+        hoursInterval = HOURS_USER_SATURDAY
       } else {
-        hoursInterval = HOURS_BUSINESS_DAYS
+        hoursInterval = HOURS_USER_BUSINESS_DAYS
       }
 
       const query = await Database
