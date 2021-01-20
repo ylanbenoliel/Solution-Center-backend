@@ -42,6 +42,7 @@ class AdminEventController {
  */
   async userIsAdmin (userId) {
     const user = await User.findOrFail(userId)
+    // eslint-disable-next-line eqeqeq
     const isAdmin = user.is_admin == '1'
     return isAdmin
   }
@@ -190,7 +191,7 @@ class AdminEventController {
       const { user, date, time, room } = request.all()
       const adminID = auth.user.id
 
-      if (this.userIsAdmin(adminID)) {
+      if (!this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -246,7 +247,7 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      if (this.userIsAdmin(adminID)) {
+      if (!this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -281,7 +282,7 @@ class AdminEventController {
         'time'
       ])
 
-      if (this.userIsAdmin(adminID)) {
+      if (!this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
