@@ -38,11 +38,12 @@ class AdminEventController {
 
   /**
  * @param {number} userId
- * @returns {boolean} admin
+ * @returns {Number} admin
  */
   async userIsAdmin (userId) {
     const user = await User.findOrFail(userId)
-    return !!user.is_admin
+    const isAdmin = user.is_admin == '1'
+    return isAdmin
   }
 
   /**
@@ -373,7 +374,7 @@ class AdminEventController {
       const id = Number(params.id)
       const adminID = auth.user.id
 
-      if (this.userIsAdmin(adminID)) {
+      if (!this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
