@@ -72,7 +72,7 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      if (this.userIsAdmin(adminID)) {
+      if (!this.userIsAdmin(adminID)) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
