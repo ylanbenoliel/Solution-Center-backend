@@ -49,13 +49,13 @@ class DateController {
       const userID = request.input('user', auth.user.id)
       await this.verifyEndOfPlan(userID)
 
-      const currentDate = new Date()
+      const plan = await Plan.findBy('user_id', userID)
+      const planJSON = plan.toJSON()
+
+      const currentDate = new Date(Date.now())
       const minDate = format(currentDate, 'yyyy-MM-dd')
       let maxDate = ''
       let saturday = null
-
-      const plan = await Plan.findBy('user_id', userID)
-      const planJSON = plan.toJSON()
 
       if (planJSON.plan !== '1') {
         maxDate = addDays(new Date(planJSON.updated_at), 30)
