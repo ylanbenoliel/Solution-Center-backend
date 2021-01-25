@@ -51,15 +51,14 @@ class DateController {
       await this.verifyEndOfPlan(userID)
 
       const plan = await Plan.findBy('user_id', userID)
-      const planJSON = plan.toJSON()
 
       const currentDate = new Date(Date.now())
       const minDate = format(currentDate, 'yyyy-MM-dd')
+
       let maxDate = ''
       let saturday = null
-
-      if (planJSON.plan !== '1') {
-        maxDate = addDays(new Date(planJSON.updated_at), 30)
+      if (Number(plan.plan) !== 1) {
+        maxDate = addDays(new Date(plan.updated_at), 30)
         saturday = this.whichSaturday(maxDate, isThursday)
       } else {
         saturday = this.whichSaturday(currentDate, isFriday)
