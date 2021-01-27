@@ -306,6 +306,15 @@ class EventController {
           .send({ message: 'Não está autorizado a deletar esse horário!' })
       }
 
+      const { room, date, time } = event
+
+      const formattedDate = format(date, 'dd/MM/yyyy')
+      const messageToSave =
+      `Você apagou a reserva da Sala ${this.roomName(room)},` +
+      ` Data ${formattedDate}, Hora ${time}.`
+
+      await Message.create({ user_id: userID, message: messageToSave })
+
       await Event
         .query()
         .where({
