@@ -30,4 +30,13 @@ function timeToSaveInDatabase (time) {
   return formattedTime
 }
 
-module.exports = { writeLog, timeToSaveInDatabase }
+/**
+ * @param {string} date
+ * @returns {string} dateWithSlash
+ */
+function parseDateFromHyphenToSlash (date) {
+  const parsedDate = date.split('-').reverse().join('/')
+  return parsedDate
+}
+
+module.exports = { writeLog, timeToSaveInDatabase, parseDateFromHyphenToSlash }
