@@ -298,34 +298,32 @@ class EventController {
       const eventID = params.id
       const userID = auth.user.id
 
-      const event =
-        await Event.query()
-          .where(
-            {
-              id: eventID,
-              user_id: userID
-            }
-          )
-          .fetch()
+      const event = await Event.findOrFail(eventID)
 
-      const jsonEvent = event.toJSON()[0]
-      // eslint-disable-next-line eqeqeq
-      if (jsonEvent.user_id != userID) {
-        return response.status(401)
-          .send({ message: 'Não está autorizado a deletar esse horário' })
+      if (event.user_id !== Number(userID)) {
+        return response
+          .status(401)
+          .send({ message: 'Não está autorizado a deletar esse horário!' })
       }
 
-      await Event.query()
+      await Event
+        .query()
         .where({
-          id: eventID,
-          user_id: userID
+          id: eventID
         }).delete()
 
-      return response.status(200).send({ message: 'Horário desmarcado' })
+      return response
+        .status(200)
+        .send({ message: 'Horário desmarcado.' })
     } catch (error) {
+      if (Number(error.status) === 404) {
+        return response
+          .status(error.status)
+          .send({ message: 'Reserva não encontrada.' })
+      }
       return response
         .status(error.status)
-        .send({ message: 'Não foi possível verificar horários' })
+        .send({ message: 'Não foi possível verificar horários.' })
     }
   }
 }
