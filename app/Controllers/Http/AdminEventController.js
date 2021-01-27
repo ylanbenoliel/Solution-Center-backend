@@ -36,6 +36,12 @@ class AdminEventController {
     return dateBars
   }
 
+  firstNameAndLastName (fullName) {
+    const nameSplited = fullName.split(' ')
+    const firstNameAndLastName = `${nameSplited[0]} ${nameSplited[nameSplited.length - 1]}`
+    return firstNameAndLastName
+  }
+
   /**
  * @param {number} userId
  * @returns {Number} admin
@@ -335,7 +341,7 @@ class AdminEventController {
       if (event.status_payment === 1) {
         const messageString =
            'confirmou pagamento de ' +
-           `${user.name}, ` +
+           `${this.firstNameAndLastName(user.name)}, ` +
            `Sala ${this.roomName(room)}, ` +
            `Dia ${this.dateWithBars(date)}, Hora ${time}`
 
@@ -347,7 +353,7 @@ class AdminEventController {
       if (event.status_payment === 0) {
         const messageString =
            'removeu pagamento de ' +
-           `${user.name}, ` +
+           `${this.firstNameAndLastName(user.name)}, ` +
            `Sala ${this.roomName(room)}, ` +
            `Dia ${this.dateWithBars(date)}, Hora ${time}`
 
