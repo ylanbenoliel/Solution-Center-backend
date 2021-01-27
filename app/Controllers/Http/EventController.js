@@ -10,7 +10,7 @@ const {
   isPast,
   subHours
 } = require('date-fns')
-const { timeToSaveInDatabase } = require('../../Helpers/functions')
+const { timeToSaveInDatabase, parseDateFromHyphenToSlash } = require('../../Helpers/functions')
 
 const {
   HOURS_USER_BUSINESS_DAYS,
@@ -21,6 +21,7 @@ const {
 const Database = use('Database')
 const Event = use('App/Models/Event')
 const User = use('App/Models/User')
+const Message = use('App/Models/Message')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -208,6 +209,11 @@ class EventController {
         time: formattedTime
       }
       const newEvent = await Event.create(data)
+
+      const messageToSave =
+      `Você reservou a Sala ${this.roomName(room)},` +
+      ` Data ${parseDateFromHyphenToSlash(date)}, Hora ${formattedTime}.`
+      await Message.create({ user_id: userID, message: messageToSave })
 
       return response
         .status(200)
