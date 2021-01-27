@@ -20,7 +20,7 @@ const { writeLog, timeToSaveInDatabase } = require('../../Helpers/functions.js')
 class AdminEventController {
   roomName (roomId) {
     const ROOM_NAME = ROOM_DATA.find((room) => {
-      if (room.id === roomId) {
+      if (room.id === Number(roomId)) {
         return room.name
       } return false
     })
@@ -326,36 +326,36 @@ class AdminEventController {
       const adminID = auth.user.id
 
       const event = await Event.findOrFail(id)
-      const { user_id, time, room } = event.toJSON()
       await event.merge({ status_payment: status_payment })
       await event.save()
-      const name = await this.getUserName(Number(user_id))
+      const { user_id, room, time, date } = event
 
-      if (status_payment === 1) {
+      const user = await User.find(user_id)
+
+      if (event.status_payment === 1) {
         const messageString =
            'confirmou pagamento de ' +
-           `${name}, ` +
-           `Sala ${this.roomName(room)} ` +
-         `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
+           `${user.name}, ` +
+           `Sala ${this.roomName(room)}, ` +
+           `Dia ${this.dateWithBars(date)}, Hora ${time}`
 
         writeLog(adminID, messageString)
-
         return response
           .status(200)
           .send({ message: 'Pagamento efetuado.', event })
       }
-      if (status_payment === 0) {
+      if (event.status_payment === 0) {
         const messageString =
            'removeu pagamento de ' +
-           `${name}, ` +
+           `${user.name}, ` +
            `Sala ${this.roomName(room)}, ` +
-           `Dia ${this.dateWithBars(event.date)}, Hora ${time}`
+           `Dia ${this.dateWithBars(date)}, Hora ${time}`
 
         writeLog(adminID, messageString)
 
         return response
           .status(200)
-          .send({ message: 'Pagamento não efetuado', event })
+          .send({ message: 'Pagamento não efetuado.', event })
       }
     } catch (error) {
       return response
