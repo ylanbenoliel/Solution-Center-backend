@@ -394,8 +394,18 @@ class AdminEventController {
         return response.status(404).send({ message: 'Evento não encontrado.' })
       }
 
+      const { room, date, time, user_id } = event
+
       const eventToDelete = await Event.findOrFail(id)
       await eventToDelete.delete()
+
+      const formattedDate = format(date, 'dd/MM/yyyy')
+      const userName = await this.getUserName(user_id)
+      const userFirstAndLastName = this.firstNameAndLastName(userName)
+      const roomName = this.roomName(room)
+
+      writeLog(adminID, `apagou reserva de ${userFirstAndLastName}, Sala ${roomName}, ` +
+      `Data ${formattedDate}, Hora ${time}`)
 
       return response
         .status(200)
