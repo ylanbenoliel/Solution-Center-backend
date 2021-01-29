@@ -295,7 +295,6 @@ class AdminEventController {
       }
 
       const formattedTime = timeToSaveInDatabase(data.time)
-      // const formattedTime = `${data.time.split(':')[0]}:00:00`
 
       const hasEvent = await Event
         .query()
@@ -313,6 +312,16 @@ class AdminEventController {
       const toSave = { ...data, time: formattedTime }
       event.merge(toSave)
       await event.save()
+
+      const { date, time, room, user_id: userId } = event
+
+      const formattedDate = this.dateWithBars(date)
+      const localRoom = this.roomName(room)
+      const userName = await this.getUserName(userId)
+
+      const messageLog = `alterou reserva de ${userName} para Sala ${localRoom}, Dia ${formattedDate}, Hora ${time}`
+
+      writeLog(adminID, messageLog)
 
       return response
         .status(200)
@@ -397,6 +406,7 @@ class AdminEventController {
       const eventToDelete = await Event.findOrFail(id)
       await eventToDelete.delete()
 
+      // TODO: Replace this format to local function
       const formattedDate = format(date, 'dd/MM/yyyy')
       const userName = await this.getUserName(user_id)
       const userFirstAndLastName = this.firstNameAndLastName(userName)
