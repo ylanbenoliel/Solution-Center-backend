@@ -37,10 +37,10 @@ class AdminEventController {
     return dateBars
   }
 
-  // parseISODate (date) {
-  //   const parseDate = parseISO(date)
-  //   return parseDate
-  // }
+  parseISODate (date) {
+    const parseDate = parseISO(date)
+    return parseDate
+  }
 
   firstNameAndLastName (fullName) {
     const nameSplited = fullName.split(' ')
@@ -121,6 +121,7 @@ class AdminEventController {
 
       let query = {}
       let hoursInterval = []
+      // FIXME remove to local function
       const ISODate = parseISO(date)
 
       if (isSaturday(ISODate)) {
@@ -194,6 +195,41 @@ class AdminEventController {
       return response
         .status(error.status)
         .send({ message: 'Ocorreu um erro ao retornar os horários.' })
+    }
+  }
+
+  async closeDay ({ request, response, auth }) {
+    try {
+      const { date } = request.all()
+      const adminID = auth.user.id
+      const ISODate = this.parseISODate(date)
+
+      let hoursInterval = []
+
+      if (isSaturday(ISODate)) {
+        hoursInterval = HOURS_ADMIN_SATURDAY
+      } else {
+        hoursInterval = HOURS_ADMIN_BUSINESS_DAYS
+      }
+
+      const allData = []
+      for (let i = 0; i < ROOM_IDS.length; i++) {
+        const room = ROOM_IDS[i]
+        for (let j = 0; j < hoursInterval.length; j++) {
+          const hour = hoursInterval[j]
+          const formattedTime = timeToSaveInDatabase(hour)
+          allData.push({ user_id: adminID, room, date: ISODate, time: formattedTime, status_payment: 1 })
+        }
+      }
+
+      await Event.createMany(allData)
+      return response
+        .status(200)
+        .send({ message: 'Dia fechado.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Ocorreu um erro ao salvar os horários.' })
     }
   }
 
