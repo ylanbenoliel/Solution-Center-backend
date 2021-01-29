@@ -318,11 +318,11 @@ class AdminEventController {
 
       return response
         .status(200)
-        .send({ message: 'Horário atualizado!', event })
+        .send({ message: 'Reserva atualizada!', event })
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao atualizar horário.' })
+        .send({ message: 'Erro ao atualizar reserva.' })
     }
   }
 
