@@ -60,6 +60,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('admin/events/new', 'AdminEventController.store')
+  Route.post('admin/events/close-day', 'AdminEventController.closeDay')
   Route.post('admin/events/agenda', 'AdminEventController.agenda')
   Route.post('admin/events/list/user', 'AdminEventController.show')
   Route.post('admin/events/list/debts', 'AdminEventController.eventsWithDebt')
