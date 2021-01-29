@@ -155,7 +155,7 @@ class AdminEventController {
       for (let i = 0; i < hoursInterval.length; i++) {
         const hour = hoursInterval[i]
         for (let j = 0; j < ROOM_IDS.length; j++) {
-          const room = j + 1
+          const room = ROOM_IDS[j]
 
           const hasEvent = query
             .find(event => Number(event.room) === room && event.time.includes(hour))
