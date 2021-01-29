@@ -16,10 +16,13 @@ const ROOM_DATA = [
   { id: 9, name: 'Carolina de Jesus' }
 ]
 
+const ROOM_IDS = ROOM_DATA.map(data => data.id)
+
 module.exports = {
   HOURS_ADMIN_BUSINESS_DAYS,
   HOURS_ADMIN_SATURDAY,
   HOURS_USER_BUSINESS_DAYS,
   HOURS_USER_SATURDAY,
-  ROOM_DATA
+  ROOM_DATA,
+  ROOM_IDS
 }
