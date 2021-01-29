@@ -9,7 +9,8 @@ const {
 const {
   HOURS_ADMIN_SATURDAY,
   HOURS_ADMIN_BUSINESS_DAYS,
-  ROOM_DATA
+  ROOM_DATA,
+  ROOM_IDS
 } = require('../../Helpers/constants')
 
 const Database = use('Database')
@@ -35,6 +36,11 @@ class AdminEventController {
     const dateBars = date.split('-').reverse().join('/')
     return dateBars
   }
+
+  // parseISODate (date) {
+  //   const parseDate = parseISO(date)
+  //   return parseDate
+  // }
 
   firstNameAndLastName (fullName) {
     const nameSplited = fullName.split(' ')
@@ -112,7 +118,6 @@ class AdminEventController {
   async agenda ({ request, response }) {
     try {
       const { date } = request.all()
-      const ROOM_IDS = ROOM_DATA.map((data) => data.room)
 
       let query = {}
       let hoursInterval = []
