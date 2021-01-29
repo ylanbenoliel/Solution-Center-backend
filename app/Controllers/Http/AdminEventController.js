@@ -202,6 +202,12 @@ class AdminEventController {
     try {
       const { date } = request.all()
       const adminID = auth.user.id
+
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
+
       const ISODate = this.parseISODate(date)
 
       let hoursInterval = []
