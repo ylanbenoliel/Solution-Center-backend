@@ -297,16 +297,14 @@ class AdminEventController {
       const formattedTime = timeToSaveInDatabase(data.time)
       // const formattedTime = `${data.time.split(':')[0]}:00:00`
 
-      const evt = await Event
+      const hasEvent = await Event
         .query()
         .where({
           date: data.date, time: formattedTime, room: data.room
         })
         .fetch()
 
-      const eventJSON = evt.toJSON()[0]
-
-      if (eventJSON) {
+      if (hasEvent.rows.length !== 0) {
         return response.status(406)
           .send({ message: 'Já existe reserva nesse horário.' })
       }
