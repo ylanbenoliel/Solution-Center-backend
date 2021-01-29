@@ -47,10 +47,12 @@ class AdminEventController {
  * @returns {Number} admin
  */
   async userIsAdmin (userId) {
-    const user = await User.findOrFail(userId)
-    // eslint-disable-next-line eqeqeq
-    const isAdmin = user.is_admin == '1'
-    return isAdmin
+    try {
+      const { is_admin: isAdmin } = await User.findOrFail(userId)
+      return isAdmin
+    } catch (error) {
+      throw new Error('Não foi possível carregar usuário.')
+    }
   }
 
   /**
@@ -78,7 +80,8 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      if (!this.userIsAdmin(adminID)) {
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -199,7 +202,8 @@ class AdminEventController {
       const { user, date, time, room } = request.all()
       const adminID = auth.user.id
 
-      if (!this.userIsAdmin(adminID)) {
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -255,7 +259,8 @@ class AdminEventController {
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
-      if (!this.userIsAdmin(adminID)) {
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -290,7 +295,8 @@ class AdminEventController {
         'time'
       ])
 
-      if (!this.userIsAdmin(adminID)) {
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
@@ -337,6 +343,11 @@ class AdminEventController {
     try {
       const { id, status_payment } = request.all()
       const adminID = auth.user.id
+
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
+        return response.status(401).send({ message: 'Não autorizado.' })
+      }
 
       const event = await Event.findOrFail(id)
       await event.merge({ status_payment: status_payment })
@@ -390,7 +401,8 @@ class AdminEventController {
       const id = Number(params.id)
       const adminID = auth.user.id
 
-      if (!this.userIsAdmin(adminID)) {
+      const isAdmin = await this.userIsAdmin(adminID)
+      if (!isAdmin) {
         return response.status(401).send({ message: 'Não autorizado.' })
       }
 
