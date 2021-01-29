@@ -121,8 +121,8 @@ class AdminEventController {
 
       let query = {}
       let hoursInterval = []
-      // FIXME remove to local function
-      const ISODate = parseISO(date)
+
+      const ISODate = this.parseISODate(date)
 
       if (isSaturday(ISODate)) {
         hoursInterval = HOURS_ADMIN_SATURDAY
