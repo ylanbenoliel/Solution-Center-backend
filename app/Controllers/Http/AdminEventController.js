@@ -210,6 +210,14 @@ class AdminEventController {
 
       const ISODate = this.parseISODate(date)
 
+      const hasEvent = await Event.findBy('date', ISODate)
+
+      if (hasEvent) {
+        return response
+          .status(406)
+          .send({ message: 'Verifique se existe uma reserva nesse dia.' })
+      }
+
       let hoursInterval = []
 
       if (isSaturday(ISODate)) {
