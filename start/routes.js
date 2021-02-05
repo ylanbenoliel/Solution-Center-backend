@@ -18,6 +18,8 @@ const Route = use('Route')
 
 Route.get('/', () => 'Working...')
 
+Route.get('/price', 'PriceController.index')
+
 Route.get('/privacy', ({ view }) => {
   return view.render('privacy')
 })

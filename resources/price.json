@@ -1,0 +1,19 @@
+{
+  "avulso": 40,
+  "turno": {
+    "valor": 210,
+    "adicional": 30
+  },
+  "diaria": {
+    "valor": 300,
+    "adicional": 30
+  },
+  "fidelidade":{
+    "valor":120,
+    "hora": 30
+  },
+  "mensal":{
+    "valor":2000,
+    "hora":30
+  }
+}
