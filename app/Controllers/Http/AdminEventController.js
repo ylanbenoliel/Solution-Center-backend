@@ -474,8 +474,7 @@ class AdminEventController {
       const eventToDelete = await Event.findOrFail(id)
       await eventToDelete.delete()
 
-      // TODO: Replace this format to local function
-      const formattedDate = format(date, 'dd/MM/yyyy')
+      const formattedDate = this.dateWithBars(date)
       const userName = await this.getUserName(user_id)
       const userFirstAndLastName = this.firstNameAndLastName(userName)
       const roomName = this.roomName(room)
