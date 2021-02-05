@@ -1,6 +1,5 @@
 'use strict'
 
-const User = use('App/Models/User')
 const Notification = use('App/Models/Notification')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -19,22 +18,22 @@ class NotificationController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async storeOrUpdate ({ request, response }) {
+  async storeOrUpdate ({ request, auth, response }) {
     try {
-      const { email, token } = request.all()
+      const USER_ID = auth.user.id
+      const { token } = request.all()
 
-      const user = await User.findBy('email', email)
-      const hasToken = await Notification.findBy('user_id', user.id)
-
+      const hasToken = await Notification.findBy('user_id', USER_ID)
       if (!hasToken) {
-        await Notification
-          .create({ user_id: user.id, token })
-        return response.status(204).send()
+        // TODO verify if push token already exists
+        await Notification.create({ user_id: USER_ID, token: token })
+        return response.status(200).send({ message: 'Token criado.' })
       }
+
       hasToken.merge({ token: token })
       await hasToken.save()
 
-      return response.status(204).send()
+      return response.status(200).send({ message: 'Token atualizado.' })
     } catch (error) {
       return response
         .status(error.status)

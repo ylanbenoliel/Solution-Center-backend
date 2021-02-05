@@ -57,6 +57,7 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.post('/notification/register', 'NotificationController.storeOrUpdate')
+  .middleware('auth')
 
 Route.group(() => {
   Route.get('/dates', 'DateController.show')
