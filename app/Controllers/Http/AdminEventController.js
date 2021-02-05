@@ -92,13 +92,14 @@ class AdminEventController {
       }
 
       let event = {}
-
+      const currentDate = new Date()
       event = await Event.query()
         .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
         .where({
           user_id: user,
           status_payment: 0
         })
+        .where('date', '<', currentDate)
         .orderBy('date', 'desc')
         .paginate(page)
 
