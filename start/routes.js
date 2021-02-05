@@ -18,6 +18,8 @@ const Route = use('Route')
 
 Route.get('/', () => 'Working...')
 
+Route.get('/validate-session', 'SessionController.show').middleware('auth')
+
 Route.get('/price', 'PriceController.index')
 
 Route.get('/privacy', ({ view }) => {

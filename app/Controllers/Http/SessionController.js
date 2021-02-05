@@ -16,6 +16,20 @@ class SessionController {
         .send({ message: 'Usuário ou senha incorretos.' })
     }
   }
+
+  async show ({ auth, response }) {
+    try {
+      const USER_ID = auth.user.id
+      const user = await User.find(USER_ID)
+      const { token } = await auth.generate(user)
+
+      return { admin: user.is_admin, token: token }
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Usuário não encontrado.' })
+    }
+  }
 }
 
 module.exports = SessionController
