@@ -71,9 +71,9 @@ class UserController {
     }
   }
 
-  async show ({ auth, response }) {
+  async show ({ auth, request, response }) {
     try {
-      const userID = auth.user.id
+      const userID = request.input('user', auth.user.id)
       const user = await User
         .query()
         .select('id', 'name', 'email', 'address', 'phone', 'cpf', 'rg')
