@@ -4,7 +4,10 @@ const Database = use('Database')
 const User = use('App/Models/User')
 const Plan = use('App/Models/Plan')
 
-const { writeLog } = require('../../Helpers/functions.js')
+const { expoInstance } = require('../../Helpers/expo')
+
+const { writeLog, prepareNotifications } = require('../../Helpers/functions.js')
+
 class UserController {
   async createPlan (id) {
     await Plan.create({ user_id: id, plan: 1 })
@@ -15,7 +18,6 @@ class UserController {
       const data = request.only([
         'name', 'email', 'rg', 'cpf', 'phone', 'password', 'address'
       ])
-
       const userExists = await User.findBy('email', data.email)
 
       if (userExists) {
@@ -23,10 +25,29 @@ class UserController {
           .status(400)
           .send({ message: 'Usuário já registrado!' })
       }
-      const { id } = await User.create(data)
+
+      const admin = await User
+        .query()
+        .select('id', 'name')
+        .where('is_admin', '=', '1')
+        .fetch()
+
+      const adminIds = admin.rows.map(user => user.id)
+
+      const { id, name } = await User.create(data)
 
       this.createPlan(id)
       writeLog(id, 'se cadastrou.')
+
+      const messageString = `${name} se cadastrou.`
+
+      const sendPushNotifications = await prepareNotifications(messageString, adminIds)
+      const sendWithExpo = []
+      if (sendPushNotifications) {
+        const expo = expoInstance
+        sendWithExpo.push(sendPushNotifications)
+        await expo.sendPushNotificationsAsync(sendWithExpo)
+      }
 
       return { message: 'Usuário cadastrado.', id }
     } catch (error) {
