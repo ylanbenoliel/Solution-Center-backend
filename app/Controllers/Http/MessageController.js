@@ -3,7 +3,9 @@
 const { Expo } = require('expo-server-sdk')
 
 const Message = use('App/Models/Message')
-const Notification = use('App/Models/Notification')
+// const Notification = use('App/Models/Notification')
+
+const { prepareNotifications } = require('../../Helpers/functions')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -13,26 +15,6 @@ const Notification = use('App/Models/Notification')
  * Resourceful controller for interacting with messages
  */
 class MessageController {
-  async prepareNotifications (message, userArray) {
-    const body = { body: message }
-    const notificationTokens = []
-    for (let i = 0; i < userArray.length; i++) {
-      const userID = userArray[i].user
-      const pushToken = await Notification
-        .query()
-        .select('token')
-        .where({ user_id: userID })
-        .fetch()
-      if (pushToken.rows.length === 0) {
-        continue
-      }
-      notificationTokens.push(pushToken.toJSON()[0].token)
-    }
-    const sendNotifications = { to: notificationTokens, sound: 'default', ...body }
-    if (!sendNotifications.to.length) return null
-    return sendNotifications
-  }
-
   /**
    * Show a list of all messages.
    * GET messages
@@ -69,20 +51,21 @@ class MessageController {
    */
   async store ({ request, response }) {
     try {
-      const userArray = request.collect(['user'])
+      const users = request.collect(['user'])
       const messageData = request.only('message')
       const messageString = messageData.message
+      const userArray = users.map(id => id.user)
 
-      const dataToStore = userArray.map(user => {
-        return { user_id: user.user, message: messageString }
-      })
-      const sendPushNotifications = await this.prepareNotifications(messageString, userArray)
+      const sendPushNotifications = await prepareNotifications(messageString, userArray)
       const sendWithExpo = []
       if (sendPushNotifications) {
         const expo = new Expo()
         sendWithExpo.push(sendPushNotifications)
         await expo.sendPushNotificationsAsync(sendWithExpo)
       }
+      const dataToStore = users.map(user => {
+        return { user_id: user.user, message: messageString }
+      })
       await Message.createMany(dataToStore)
       return response.status(200).send({ message: 'Mensagens salvas.' })
     } catch (error) {
