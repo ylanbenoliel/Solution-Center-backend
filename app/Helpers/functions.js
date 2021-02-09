@@ -1,5 +1,6 @@
 const Log = use('App/Models/Log')
 const User = use('App/Models/User')
+const Notification = use('App/Models/Notification')
 
 async function writeLog (userID, message) {
   try {
@@ -39,4 +40,27 @@ function parseDateFromHyphenToSlash (date) {
   return parsedDate
 }
 
-module.exports = { writeLog, timeToSaveInDatabase, parseDateFromHyphenToSlash }
+async function prepareNotifications (message, userArray, title = 'Solution Center') {
+  const body = { body: message, title }
+  const notification = await Notification
+    .query()
+    .select('token')
+    .whereIn('user_id', userArray)
+    .fetch()
+
+  const tokens = []
+  notification.rows.forEach(e => {
+    tokens.push(e.token)
+  })
+
+  const sendNotifications = { to: tokens, sound: 'default', ...body }
+  if (!sendNotifications.to.length) return null
+  return sendNotifications
+}
+
+module.exports = {
+  writeLog,
+  timeToSaveInDatabase,
+  parseDateFromHyphenToSlash,
+  prepareNotifications
+}
