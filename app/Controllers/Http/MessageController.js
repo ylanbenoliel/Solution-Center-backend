@@ -1,10 +1,8 @@
 'use strict'
 
-const { Expo } = require('expo-server-sdk')
-
 const Message = use('App/Models/Message')
-// const Notification = use('App/Models/Notification')
 
+const { expoInstance } = require('../../Helpers/expo')
 const { prepareNotifications } = require('../../Helpers/functions')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -59,7 +57,7 @@ class MessageController {
       const sendPushNotifications = await prepareNotifications(messageString, userArray)
       const sendWithExpo = []
       if (sendPushNotifications) {
-        const expo = new Expo()
+        const expo = expoInstance
         sendWithExpo.push(sendPushNotifications)
         await expo.sendPushNotificationsAsync(sendWithExpo)
       }
