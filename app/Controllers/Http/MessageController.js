@@ -52,8 +52,8 @@ class MessageController {
   async store ({ request, response }) {
     try {
       const users = request.collect(['user'])
-      const messageData = request.only('message')
-      const messageString = messageData.message
+      const { message } = request.only('message')
+      const messageString = message
       const userArray = users.map(id => id.user)
 
       const sendPushNotifications = await prepareNotifications(messageString, userArray)
