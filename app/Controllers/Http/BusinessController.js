@@ -1,6 +1,6 @@
 'use strict'
 
-const { HOURS_ADMIN_BUSINESS_DAYS } = require('../../Helpers/constants')
+const { HOURS_ADMIN_BUSINESS_DAYS, ROOM_IDS } = require('../../Helpers/constants')
 
 const Database = use('Database')
 
@@ -22,7 +22,9 @@ class BusinessController {
         .whereBetween('events.date', [startDate, endDate])
 
       const totalRooms = event.length
-      const roomCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      const roomCount = {}
+
+      ROOM_IDS.forEach(id => { roomCount[id] = 0 })
 
       event.forEach(element => {
         const roomNumber = Number(element.room)
