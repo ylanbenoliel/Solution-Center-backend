@@ -7,6 +7,12 @@ class BusinessController {
     try {
       const { start: startDate, end: endDate } = request.all()
 
+      if (!startDate || !endDate) {
+        return response
+          .status(400)
+          .send({ message: 'Datas não informadas.' })
+      }
+
       const event = await Database
         .query()
         .select('events.date', 'events.room')
