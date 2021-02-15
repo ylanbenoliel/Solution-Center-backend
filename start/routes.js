@@ -87,3 +87,5 @@ Route.group(() => {
 
 Route.get('/logs', 'LogController.index')
   .middleware('auth')
+
+Route.post('/rooms', 'BusinessController.countRoomsByDateRange')
