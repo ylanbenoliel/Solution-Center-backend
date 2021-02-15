@@ -137,6 +137,26 @@ class UserController {
         .send({ message: 'Erro ao buscar pendências.' })
     }
   }
+
+  async destroy ({ request, response }) {
+    try {
+      const { id } = request.params
+
+      await User
+        .query()
+        .where({
+          id: id
+        }).delete()
+
+      return response
+        .status(200)
+        .send({ message: 'Usuário excluído.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao excluir usuário.' })
+    }
+  }
 }
 
 module.exports = UserController
