@@ -40,7 +40,7 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.resource('users', 'UserController')
-  .apiOnly().except(['store', 'destroy']).middleware('auth')
+  .apiOnly().except(['store']).middleware('auth')
 
 Route.post('/authenticate', 'SessionController.authenticate')
 
