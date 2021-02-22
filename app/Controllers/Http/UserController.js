@@ -142,11 +142,17 @@ class UserController {
     try {
       const { id } = request.params
 
+      const userExists = await User.find(id)
+      if (!userExists) {
+        return response
+          .status(404)
+          .send({ message: 'Usuário não encontrado.' })
+      }
+
       await User
         .query()
-        .where({
-          id: id
-        }).delete()
+        .where('id', '=', id)
+        .delete()
 
       return response
         .status(200)
