@@ -3,6 +3,7 @@
 const Database = use('Database')
 const User = use('App/Models/User')
 const Plan = use('App/Models/Plan')
+const Job = use('App/Models/Job')
 
 const { expoInstance } = require('../../Helpers/expo')
 
@@ -11,6 +12,14 @@ const { writeLog, prepareNotifications } = require('../../Helpers/functions.js')
 class UserController {
   async createPlan (id) {
     await Plan.create({ user_id: id, plan: 1 })
+  }
+
+  async insertDefaultJob (userId) {
+    const { id: jobId } = await Job.findBy('title', 'Outros')
+
+    const user = await User.find(userId)
+    user.merge({ job_id: jobId })
+    await user.save()
   }
 
   async store ({ request, response }) {
@@ -26,20 +35,20 @@ class UserController {
           .send({ message: 'Usuário já registrado!' })
       }
 
+      const { id, name } = await User.create(data)
+
+      this.createPlan(id)
+      this.insertDefaultJob(id)
+      writeLog(id, 'se cadastrou.')
+
       const admin = await User
         .query()
         .select('id', 'name')
         .where('is_admin', '=', '1')
         .fetch()
 
-      const adminIds = admin.rows.map(user => user.id)
-
-      const { id, name } = await User.create(data)
-
-      this.createPlan(id)
-      writeLog(id, 'se cadastrou.')
-
       const messageString = `${name} se cadastrou.`
+      const adminIds = admin.rows.map(user => user.id)
 
       const sendPushNotifications = await prepareNotifications(messageString, adminIds)
       const sendWithExpo = []
