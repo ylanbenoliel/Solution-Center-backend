@@ -92,3 +92,8 @@ Route.group(() => {
   Route.post('/business/rooms', 'BusinessController.countRoomsByDateRange')
   Route.post('/business/hours', 'BusinessController.countHoursByDateRange')
 }).middleware('auth')
+
+Route.group(() => {
+  Route.post('/jobs', 'JobController.store')
+  // Route.post('/business/hours', 'BusinessController.countHoursByDateRange')
+})
