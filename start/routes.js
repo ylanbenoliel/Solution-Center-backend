@@ -95,5 +95,5 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/jobs', 'JobController.store')
-  // Route.post('/business/hours', 'BusinessController.countHoursByDateRange')
+  Route.get('/jobs/populate', 'JobController.populate')
 })

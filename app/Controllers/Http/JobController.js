@@ -1,5 +1,6 @@
 'use strict'
 
+const Database = use('Database')
 const Job = use('App/Models/Job')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -83,6 +84,25 @@ class JobController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
+  }
+
+  async populate ({ response }) {
+    try {
+      const { id } = await Job.findBy('title', 'Outros')
+
+      await Database
+        .table('users')
+        .where({ job_id: null })
+        .update('job_id', id)
+
+      return response
+        .status(200)
+        .send({ message: 'Profissão dos usuários definida como padrão.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível atualizar a profissão dos usuários.' })
+    }
   }
 }
 
