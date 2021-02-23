@@ -47,7 +47,7 @@ class EventController {
    */
   async schedule ({ request, response, auth }) {
     try {
-      const { date, room } = request.all()
+      const { date, room } = request.post()
       const userID = auth.user.id
 
       const { active } = await User.find(userID)
@@ -181,7 +181,7 @@ class EventController {
  */
   async store ({ request, response, auth }) {
     try {
-      const { room, date, time } = request.all()
+      const { room, date, time } = request.post()
       const userID = auth.user.id
 
       const formattedTime = timeToSaveInDatabase(time)

@@ -7,7 +7,7 @@ const Database = use('Database')
 class BusinessController {
   async countRoomsByDateRange ({ request, response }) {
     try {
-      const { start: startDate, end: endDate } = request.all()
+      const { start: startDate, end: endDate } = request.post()
 
       if (!startDate || !endDate) {
         return response
@@ -43,7 +43,7 @@ class BusinessController {
 
   async countHoursByDateRange ({ request, response }) {
     try {
-      const { start: startDate, end: endDate } = request.all()
+      const { start: startDate, end: endDate } = request.post()
 
       if (!startDate || !endDate) {
         return response

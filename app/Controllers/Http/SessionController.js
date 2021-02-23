@@ -6,7 +6,7 @@ const User = use('App/Models/User')
 class SessionController {
   async authenticate ({ request, auth, response }) {
     try {
-      const { email, password } = request.all()
+      const { email, password } = request.post()
       const { name, is_admin } = await User.findByOrFail('email', email)
       const { token } = await auth.attempt(email, password)
       return { token, user: { name, email }, is_admin }

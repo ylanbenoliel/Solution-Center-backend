@@ -76,7 +76,7 @@ class UserController {
   async update ({ params, request, response }) {
     try {
       const user = await User.findOrFail(params.id)
-      const data = request.all()
+      const data = request.post()
       if (!data.password) {
         delete data.password
       }

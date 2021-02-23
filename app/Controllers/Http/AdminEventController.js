@@ -82,7 +82,7 @@ class AdminEventController {
 
   async eventsWithDebt ({ request, response, auth }) {
     try {
-      const { user } = request.all()
+      const { user } = request.post()
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
@@ -118,7 +118,7 @@ class AdminEventController {
    */
   async agenda ({ request, response }) {
     try {
-      const { date } = request.all()
+      const { date } = request.post()
 
       let query = {}
       let hoursInterval = []
@@ -201,7 +201,7 @@ class AdminEventController {
 
   async closeDay ({ request, response, auth }) {
     try {
-      const { date } = request.all()
+      const { date } = request.post()
       const adminID = auth.user.id
 
       const isAdmin = await this.userIsAdmin(adminID)
@@ -255,7 +255,7 @@ class AdminEventController {
    */
   async store ({ request, response, auth }) {
     try {
-      const { user, date, time, room } = request.all()
+      const { user, date, time, room } = request.post()
       const adminID = auth.user.id
 
       const isAdmin = await this.userIsAdmin(adminID)
@@ -311,7 +311,7 @@ class AdminEventController {
    */
   async show ({ request, response, auth }) {
     try {
-      const { user } = request.all()
+      const { user } = request.post()
       const page = request.input('page', 1)
       const adminID = auth.user.id
 
@@ -397,7 +397,7 @@ class AdminEventController {
 
   async payment ({ request, response, auth }) {
     try {
-      const { id, status_payment } = request.all()
+      const { id, status_payment } = request.post()
       const adminID = auth.user.id
 
       const isAdmin = await this.userIsAdmin(adminID)

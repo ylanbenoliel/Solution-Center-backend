@@ -52,7 +52,7 @@ class PlanController {
   async update ({ params, request, response }) {
     try {
       const userID = Number(params.user)
-      const { plan: requestPlan } = request.all()
+      const { plan: requestPlan } = request.post()
 
       const plan = await Plan.findByOrFail('user_id', userID)
       plan.merge({ plan: requestPlan })

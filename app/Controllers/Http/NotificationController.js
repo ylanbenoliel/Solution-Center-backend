@@ -21,7 +21,7 @@ class NotificationController {
   async storeOrUpdate ({ request, auth, response }) {
     try {
       const USER_ID = auth.user.id
-      const { token } = request.all()
+      const { token } = request.post()
 
       const hasToken = await Notification.findBy('user_id', USER_ID)
       if (!hasToken) {
