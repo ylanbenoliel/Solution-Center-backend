@@ -83,17 +83,29 @@ class JobController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
-  }
+    try {
+      const currentJob = Number(params.id)
+      const { job: futureJob } = request.post()
 
-  /**
-   * Delete a job with id.
-   * DELETE jobs/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+      if (!futureJob) {
+        return response
+          .status(400)
+          .send({ message: 'Insira uma profissão.' })
+      }
+
+      const job = await Job.findOrFail(currentJob)
+
+      job.merge({ title: futureJob })
+      await job.save()
+
+      return response
+        .status(200)
+        .send({ message: 'Profissão atualizada.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível atualizar a profissão.' })
+    }
   }
 
   async populate ({ response }) {
