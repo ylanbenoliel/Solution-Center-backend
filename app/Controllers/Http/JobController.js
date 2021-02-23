@@ -1,5 +1,7 @@
 'use strict'
 
+const Job = use('App/Models/Job')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -29,7 +31,24 @@ class JobController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
+    try {
+      const { job } = request.post()
 
+      if (!job) {
+        return response
+          .status(400)
+          .send({ message: 'Insira uma profissão.' })
+      }
+      await Job.create({ title: job })
+
+      return response
+        .status(201)
+        .send({ message: 'Profissão criada.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao salvar profissão.' })
+    }
   }
 
   /**
