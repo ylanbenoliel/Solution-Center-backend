@@ -25,7 +25,6 @@ class NotificationController {
 
       const hasToken = await Notification.findBy('user_id', USER_ID)
       if (!hasToken) {
-        // TODO verify if push token already exists
         await Notification.create({ user_id: USER_ID, token: token })
         return response.status(200).send({ message: 'Token criado.' })
       }
