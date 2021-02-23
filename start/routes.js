@@ -96,6 +96,7 @@ Route.group(() => {
 Route.group(() => {
   Route.get('/jobs', 'JobController.index')
   Route.post('/jobs', 'JobController.store')
+  Route.patch('/update-user-job', 'JobController.updateUserJob')
   Route.put('/jobs/:id', 'JobController.update')
   Route.get('/jobs/populate', 'JobController.populate')
 })

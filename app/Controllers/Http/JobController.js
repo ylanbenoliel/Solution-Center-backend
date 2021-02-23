@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const Job = use('App/Models/Job')
+const User = use('App/Models/User')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -63,18 +64,6 @@ class JobController {
   }
 
   /**
-   * Display a single job.
-   * GET jobs/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
    * Update job details.
    * PUT or PATCH jobs/:id
    *
@@ -101,6 +90,35 @@ class JobController {
       return response
         .status(200)
         .send({ message: 'Profissão atualizada.' })
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível atualizar a profissão.' })
+    }
+  }
+
+  /**
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async updateUserJob ({ request, response }) {
+    try {
+      const { user: userId, job: jobId } = request.post()
+
+      if (!userId || !jobId) {
+        return response
+          .status(400)
+          .send({ message: 'Parâmetros inválidos.' })
+      }
+
+      const user = await User.findOrFail(userId)
+      user.merge({ job_id: jobId })
+      await user.save()
+
+      return response
+        .status(200)
+        .send({ message: 'Profissão do usuário atualizada.' })
     } catch (error) {
       return response
         .status(error.status)
