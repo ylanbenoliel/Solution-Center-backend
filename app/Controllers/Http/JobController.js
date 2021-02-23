@@ -98,7 +98,7 @@ class JobController {
 
   async populate ({ response }) {
     try {
-      const { id } = await Job.findBy('title', 'Outros')
+      const { id } = await Job.first()
 
       await Database
         .table('users')

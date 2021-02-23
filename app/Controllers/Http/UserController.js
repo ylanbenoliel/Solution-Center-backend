@@ -15,7 +15,7 @@ class UserController {
   }
 
   async insertDefaultJob (userId) {
-    const { id: jobId } = await Job.findBy('title', 'Outros')
+    const { id: jobId } = await Job.first()
 
     const user = await User.find(userId)
     user.merge({ job_id: jobId })
