@@ -94,6 +94,7 @@ Route.group(() => {
 }).middleware('auth')
 
 Route.group(() => {
+  Route.get('/jobs', 'JobController.index')
   Route.post('/jobs', 'JobController.store')
   Route.get('/jobs/populate', 'JobController.populate')
 })

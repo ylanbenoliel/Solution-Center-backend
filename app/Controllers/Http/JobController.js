@@ -16,11 +16,21 @@ class JobController {
    * GET jobs
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index ({ response }) {
+    try {
+      const jobs = await Job
+        .query()
+        .select('id', 'title')
+        .fetch()
+
+      return jobs
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar profissões salvas.' })
+    }
   }
 
   /**
