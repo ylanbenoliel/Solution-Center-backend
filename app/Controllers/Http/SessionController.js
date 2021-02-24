@@ -30,6 +30,23 @@ class SessionController {
         .send({ message: 'Usuário não encontrado.' })
     }
   }
+
+  async verifyDB ({ response }) {
+    try {
+      const user = await User.first()
+      if (!user) {
+        return response
+          .status(400)
+          .send({ message: 'Banco de dados desligado.' })
+      }
+
+      return response.ok('Working...')
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro de conexão.' })
+    }
+  }
 }
 
 module.exports = SessionController

@@ -16,7 +16,7 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => 'Working...')
+Route.get('/', 'SessionController.verifyDB')
 
 Route.get('/validate-session', 'SessionController.show').middleware('auth')
 
