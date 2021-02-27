@@ -7,6 +7,11 @@ class SessionController {
   async authenticate ({ request, auth, response }) {
     try {
       const { email, password } = request.post()
+      if (!email || !password) {
+        return response
+          .status(400)
+          .send({ message: 'Dados incompletos.' })
+      }
       const { name, is_admin } = await User.findByOrFail('email', email)
       const { token } = await auth.attempt(email, password)
       return { token, user: { name, email }, is_admin }
