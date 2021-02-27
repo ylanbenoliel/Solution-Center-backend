@@ -8,7 +8,8 @@ const {
   isSameDay,
   isFuture,
   isPast,
-  subHours
+  subHours,
+  isWeekend
 } = require('date-fns')
 const { timeToSaveInDatabase, parseDateFromHyphenToSlash } = require('../../Helpers/functions')
 
@@ -49,6 +50,12 @@ class EventController {
     try {
       const { date, room } = request.post()
       const userID = auth.user.id
+
+      const today = new Date()
+
+      if (isWeekend(today)) {
+        return response.status(400).send({ message: 'Selecione um dia.' })
+      }
 
       const { active } = await User.find(userID)
       if (!active) {
