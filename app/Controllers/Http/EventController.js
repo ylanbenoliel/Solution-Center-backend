@@ -53,7 +53,7 @@ class EventController {
       const dayToVerify = parseISO(date)
 
       if (isWeekend(dayToVerify)) {
-        return response.status(400).send({ message: 'Selecione um dia.' })
+        return response.status(400).send({ message: 'Selecione um dia da semana.' })
       }
 
       const { active } = await User.find(userID)
