@@ -50,10 +50,9 @@ class EventController {
     try {
       const { date, room } = request.post()
       const userID = auth.user.id
+      const dayToVerify = parseISO(date)
 
-      const today = new Date()
-
-      if (isWeekend(today)) {
+      if (isWeekend(dayToVerify)) {
         return response.status(400).send({ message: 'Selecione um dia.' })
       }
 
