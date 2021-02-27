@@ -23,7 +23,8 @@ class ForgotPasswordController {
       await user.save()
 
       const currentDateTimeFormatted = format(new Date(), "dd'/'MM'/'yyyy 'às' HH:mm")
-      Mail.send('emails.recover', { user, code, dt: currentDateTimeFormatted },
+
+      await Mail.send('emails.recover', { user, code, dt: currentDateTimeFormatted },
         (message) => {
           message
             .from(Env.get('MAIL_USERNAME'))
