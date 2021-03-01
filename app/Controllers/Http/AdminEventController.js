@@ -229,15 +229,24 @@ class AdminEventController {
 
       const allData = []
       for (let i = 0; i < ROOM_IDS.length; i++) {
-        const room = ROOM_IDS[i]
+        const room = String(ROOM_IDS[i])
         for (let j = 0; j < hoursInterval.length; j++) {
           const hour = hoursInterval[j]
           const formattedTime = timeToSaveInDatabase(hour)
-          allData.push({ user_id: adminID, room, date: ISODate, time: formattedTime, status_payment: 1 })
+          allData.push({
+            user_id: adminID,
+            room,
+            date: ISODate,
+            time: formattedTime,
+            status_payment: 1
+          })
         }
       }
 
-      await Event.createMany(allData)
+      allData.forEach(eventInfo => {
+        Promise.resolve(Event.create(eventInfo))
+      })
+
       return response
         .status(200)
         .send({ message: 'Dia fechado.' })
