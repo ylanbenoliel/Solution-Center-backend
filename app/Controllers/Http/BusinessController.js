@@ -33,7 +33,7 @@ class BusinessController {
 
       return response
         .status(200)
-        .send({ total: totalRooms, salas: roomCount })
+        .send({ total: totalRooms, rooms: roomCount })
     } catch (error) {
       return response
         .status(error.status)
