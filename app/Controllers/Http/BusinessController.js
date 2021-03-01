@@ -79,6 +79,41 @@ class BusinessController {
         .send({ message: 'Erro ao buscar informações de hora.' })
     }
   }
-}
 
+  async countJobsByDateRange ({ request, response }) {
+    try {
+      const { start: startDate, end: endDate } = request.post()
+
+      if (!startDate || !endDate) {
+        return response
+          .status(400)
+          .send({ message: 'Datas não informadas.' })
+      }
+
+      const jobs = await Database
+        .raw(`
+select 
+  j.title, 
+  count(*) occurrences 
+from jobs as j 
+  inner join users as u 
+  inner join events e on 
+    u.job_id = j.id and 
+    e.user_id = u.id
+where
+  (e.date between ? and ?)
+group by 
+  j.title 
+having 
+  count(*)>0;
+`, [startDate, endDate])
+
+      return jobs[0]
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar informações.' })
+    }
+  }
+}
 module.exports = BusinessController
