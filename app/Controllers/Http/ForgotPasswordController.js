@@ -97,6 +97,40 @@ class ForgotPasswordController {
         .send({ message: 'Não foi possível atualizar a senha.' })
     }
   }
+
+  async resetUserPassword ({ request, response, auth }) {
+    try {
+      const { user: USER } = request.only('user')
+      const ADMIN_ID = auth.user.id
+
+      const { is_admin: isAdmin } = await User.find(ADMIN_ID)
+      if (!isAdmin) {
+        return response
+          .status(401)
+          .send({ message: 'Acesso não autorizado.' })
+      }
+
+      const changeUserPassword = await User.findOrFail(USER)
+
+      const newPassword = changeUserPassword.name.split(' ')[0].toLowerCase()
+      changeUserPassword.merge({ password: `${newPassword}` })
+
+      await changeUserPassword.save()
+
+      return response
+        .status(200)
+        .send({ message: 'Senha alterada.' })
+    } catch (error) {
+      if (error.status === 404) {
+        return response
+          .status(error.status)
+          .send({ message: 'Usuário não encontrado.' })
+      }
+      return response
+        .status(error.status)
+        .send({ message: 'Não foi possível alterar a senha.' })
+    }
+  }
 }
 
 module.exports = ForgotPasswordController

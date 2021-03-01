@@ -101,3 +101,6 @@ Route.group(() => {
   Route.put('/jobs/:id', 'JobController.update')
   Route.get('/jobs/populate', 'JobController.populate')
 }).middleware('auth')
+
+Route.patch('/reset-user-password', 'ForgotPasswordController.resetUserPassword')
+  .middleware('auth')
