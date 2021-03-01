@@ -90,11 +90,11 @@ class BusinessController {
           .send({ message: 'Datas não informadas.' })
       }
 
-      const jobs = await Database
+      const [data] = await Database
         .raw(`
 select 
   j.title, 
-  count(*) occurrences 
+  count(*) count 
 from jobs as j 
   inner join users as u 
   inner join events e on 
@@ -108,7 +108,14 @@ having
   count(*)>0;
 `, [startDate, endDate])
 
-      return jobs[0]
+      let roomCount = 0
+      data.forEach(info => {
+        roomCount += info.count
+      })
+
+      return response
+        .status(200)
+        .send({ total: roomCount, jobs: data })
     } catch (error) {
       return response
         .status(error.status)
