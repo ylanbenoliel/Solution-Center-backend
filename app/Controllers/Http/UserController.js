@@ -110,6 +110,13 @@ class UserController {
         .where('id', '=', userID)
         .with('avatar')
         .fetch()
+
+      if (user.rows.length === 0) {
+        return response
+          .status(404)
+          .send({ message: 'Usuário não encontrado.' })
+      }
+
       return user
     } catch (error) {
       return response
