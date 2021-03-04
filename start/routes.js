@@ -35,12 +35,12 @@ Route.group(() => {
 })
 
 Route.group(() => {
+  Route.get('/users', 'UserController.index')
   Route.get('/user/details', 'UserController.show')
   Route.get('/users/debt', 'UserController.debt')
+  Route.patch('users/:id', 'UserController.update')
+  Route.delete('users/:id', 'UserController.destroy')
 }).middleware('auth')
-
-Route.resource('users', 'UserController')
-  .apiOnly().except(['store']).middleware('auth')
 
 Route.post('/authenticate', 'SessionController.authenticate')
 
