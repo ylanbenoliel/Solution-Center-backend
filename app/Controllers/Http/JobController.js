@@ -34,6 +34,30 @@ class JobController {
     }
   }
 
+  async show ({ params, response }) {
+    try {
+      const user = Number(params.id)
+      const [job] = await Database
+        .query()
+        .select('jobs.id as job', 'jobs.title')
+        .from('jobs')
+        .innerJoin('users', 'users.job_id', 'jobs.id')
+        .where('users.id', '=', user)
+
+      if (!job) {
+        return response
+          .status(400)
+          .send({ message: 'Usuário sem profissão.' })
+      }
+
+      return job
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: 'Erro ao buscar profissão.' })
+    }
+  }
+
   /**
    * Create/save a new job.
    * POST jobs
