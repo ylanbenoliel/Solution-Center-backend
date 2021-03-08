@@ -23,7 +23,7 @@ class JobController {
     try {
       const jobs = await Job
         .query()
-        .select('id', 'title')
+        .select('id as job', 'title')
         .fetch()
 
       return jobs
@@ -44,14 +44,14 @@ class JobController {
    */
   async store ({ request, response }) {
     try {
-      const { job } = request.post()
+      const { title } = request.post()
 
-      if (!job) {
+      if (!title) {
         return response
           .status(400)
           .send({ message: 'Insira uma profissão.' })
       }
-      await Job.create({ title: job })
+      await Job.create({ title: title })
 
       return response
         .status(201)
@@ -74,7 +74,7 @@ class JobController {
   async update ({ params, request, response }) {
     try {
       const currentJob = Number(params.id)
-      const { job: futureJob } = request.post()
+      const { title: futureJob } = request.post()
 
       if (!futureJob) {
         return response
