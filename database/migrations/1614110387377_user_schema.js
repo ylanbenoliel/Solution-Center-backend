@@ -11,7 +11,7 @@ class UserSchema extends Schema {
         .integer('job_id')
         .unsigned()
         .references('id')
-        .inTable('users')
+        .inTable('jobs')
         .onUpdate('CASCADE')
         .onDelete('SET NULL')
     })
