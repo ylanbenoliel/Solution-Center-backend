@@ -100,7 +100,6 @@ Route.group(() => {
   Route.post('/jobs', 'JobController.store')
   Route.patch('/update-user-job', 'JobController.updateUserJob')
   Route.put('/jobs/:id', 'JobController.update')
-  Route.get('/jobs/populate', 'JobController.populate')
 }).middleware('auth')
 
 Route.patch('/reset-user-password', 'ForgotPasswordController.resetUserPassword')
