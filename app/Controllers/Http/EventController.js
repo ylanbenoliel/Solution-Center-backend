@@ -311,8 +311,25 @@ class EventController {
           .status(401)
           .send({ message: 'Não está autorizado a deletar esse horário!' })
       }
+      const currentDate = subHours(new Date(), 3)
 
       const { room, date, time } = event
+
+      const dateString = format(date, 'yyyy-MM-dd')
+      const dateTimeString = `${dateString} ${time}`
+      const parsedDate = subHours(parseISO(dateTimeString), 3)
+      const dateTimeDistance = formatDistance(currentDate, parsedDate)
+      const distArray = dateTimeDistance.split(' ')
+      const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
+      const dateTimeDistanceIsHourAndBelowSix =
+      dateTimeDistance.includes('hour') && timeDistArray < 6
+      const dateTimeDistanceIsMinute = dateTimeDistance.includes('min')
+
+      if (dateTimeDistanceIsMinute || dateTimeDistanceIsHourAndBelowSix) {
+        return response
+          .status(400)
+          .send({ message: 'Tempo de cancelamento da reserva expirado.' })
+      }
 
       const formattedDate = format(date, 'dd/MM/yyyy')
       const messageToSave =
@@ -338,7 +355,7 @@ class EventController {
       }
       return response
         .status(error.status)
-        .send({ message: 'Não foi possível verificar horários.' })
+        .send({ message: 'Não foi possível desmarcar horário.' })
     }
   }
 }
