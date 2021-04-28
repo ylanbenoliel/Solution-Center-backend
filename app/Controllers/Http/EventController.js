@@ -136,7 +136,7 @@ class EventController {
           const parsedDate = subHours(parseISO(dateTimeString), 3)
           const dateTimeDistance = formatDistance(currentDate, parsedDate)
           const distArray = dateTimeDistance.split(' ')
-          const timeDistArray = distArray.length === 2 ? distArray[0] : distArray[1]
+          const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
 
           const dateTimeDistanceIsHourAndBelowSix =
           dateTimeDistance.includes('hour') && timeDistArray < 6
