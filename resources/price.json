@@ -8,12 +8,8 @@
     "valor": 300,
     "adicional": 35
   },
-  "fidelidade":{
-    "valor":120,
-    "hora": 35
-  },
-  "mensal":{
-    "valor":2000,
+  "mensal": {
+    "valor":2500,
     "hora":35
   }
 }
