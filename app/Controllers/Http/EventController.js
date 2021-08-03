@@ -9,7 +9,8 @@ const {
   isFuture,
   isPast,
   subHours,
-  isWeekend
+  isWeekend,
+  isSunday
 } = require('date-fns')
 const { timeToSaveInDatabase, parseDateFromHyphenToSlash } = require('../../Helpers/functions')
 
@@ -52,8 +53,8 @@ class EventController {
       const userID = auth.user.id
       const dayToVerify = parseISO(date)
 
-      if (isWeekend(dayToVerify)) {
-        return response.status(400).send({ message: 'Selecione um dia da semana.' })
+      if (isSunday(dayToVerify)) {
+        return response.status(400).send({ message: 'Selecione algum dia disponível!' })
       }
 
       const { active } = await User.find(userID)
