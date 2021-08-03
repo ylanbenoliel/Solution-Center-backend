@@ -5,7 +5,6 @@ const {
   isFriday,
   isThursday,
   addDays,
-  subDays,
   format,
   isAfter,
   parseISO,
@@ -64,9 +63,9 @@ class DateController {
         saturday = this.whichSaturday(currentDate, isFriday)
       }
       maxDate = saturday
-      // return friday
-      maxDate = subDays(maxDate, 1)
+
       const maxDateFormatted = format(maxDate, 'yyyy-MM-dd')
+
       response.status(200).send({ minDate, maxDate: maxDateFormatted })
     } catch (error) {
       return response
