@@ -35,6 +35,9 @@ module.exports = {
       min: 0,
       max: 3
     },
+    ssl: {
+      rejectUnauthorized: false
+    },
     debug: Env.get('DB_DEBUG', false)
   }
 
