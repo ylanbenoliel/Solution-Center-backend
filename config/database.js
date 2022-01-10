@@ -5,7 +5,7 @@ const Env = use('Env')
 
 module.exports = {
 
-  connection: Env.get('DB_CONNECTION', 'pg'),
+  connection: Env.get('DB_CONNECTION', 'mysql'),
 
   mysql: {
     client: 'mysql',
