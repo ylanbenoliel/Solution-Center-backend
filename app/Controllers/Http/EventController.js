@@ -9,7 +9,6 @@ const {
   isFuture,
   isPast,
   subHours,
-  isWeekend,
   isSunday
 } = require('date-fns')
 const { timeToSaveInDatabase, parseDateFromHyphenToSlash } = require('../../Helpers/functions')
@@ -135,12 +134,12 @@ class EventController {
           const dateString = format(hasEvent.date, 'yyyy-MM-dd')
           const dateTimeString = `${dateString} ${hasEvent.time}`
           const parsedDate = subHours(parseISO(dateTimeString), 3)
-          const dateTimeDistance = formatDistance(currentDate, parsedDate)
-          const distArray = dateTimeDistance.split(' ')
-          const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
+          const diffTime = parsedDate - currentDate
+          // const dateTimeDistance = formatDistance(currentDate, parsedDate)
+          // const distArray = dateTimeDistance.split(' ')
+          // const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
 
-          const dateTimeDistanceIsHourAndBelowSix =
-          dateTimeDistance.includes('hour') && timeDistArray < 6
+          const dateTimeDistanceIsHourAndBelowSix = diffTime <= 21600000
 
           if (isPast(parsedDate)) {
             const code = '3'
@@ -149,7 +148,7 @@ class EventController {
           }
           if (isSameDay(parsedDate, currentDate)) {
             let localCode = ''
-            if (dateTimeDistance.includes('min') || dateTimeDistanceIsHourAndBelowSix) {
+            if (dateTimeDistanceIsHourAndBelowSix) {
               localCode = '3'
             } else {
               localCode = '2'
