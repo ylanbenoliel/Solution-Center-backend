@@ -5,7 +5,7 @@
   "description": "Solution Center backend",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "ENV_SILENT=true node server.js",
     "test": "node ace test"
   },
   "keywords": [
@@ -31,6 +31,7 @@
     "date-fns-tz": "^1.0.10",
     "expo-server-sdk": "^3.6.0",
     "mysql": "^2.18.1",
+    "pg": "^8.7.1",
     "seedrandom": "^3.0.5"
   },
   "devDependencies": {

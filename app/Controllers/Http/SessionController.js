@@ -52,6 +52,11 @@ class SessionController {
         .send({ message: 'Erro de conexão.' })
     }
   }
+
+  async verifyTimeZone ({ response }) {
+    const currentDate = new Date()
+    return response.status(200).send({ dateServer: currentDate.toUTCString() })
+  }
 }
 
 module.exports = SessionController

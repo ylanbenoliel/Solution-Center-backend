@@ -17,6 +17,7 @@
 const Route = use('Route')
 
 Route.get('/', 'SessionController.verifyDB')
+Route.get('/server', 'SessionController.verifyTimeZone')
 
 Route.get('/validate-session', 'SessionController.show').middleware('auth')
 
