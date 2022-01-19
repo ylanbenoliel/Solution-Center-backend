@@ -197,6 +197,19 @@ class EventController {
 
       const formattedTime = timeToSaveInDatabase(time)
 
+      const otherUserAlreadyOwnThisEvent = await Event
+        .query()
+        .select('id')
+        .where({ room, date, time: formattedTime, user_id: !userID })
+        .fetch()
+
+      const hasEventInDesiredMoment = otherUserAlreadyOwnThisEvent.toJSON()[0]
+      if (hasEventInDesiredMoment) {
+        return response
+          .status(400)
+          .send({ message: 'Reserva de outro usuário, feche e tente novamente!' })
+      }
+
       const userEventInSameDateTime = await Event
         .query()
         .where({
