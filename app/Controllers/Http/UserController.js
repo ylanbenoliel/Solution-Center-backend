@@ -15,11 +15,15 @@ class UserController {
   }
 
   async insertDefaultJob (userId) {
-    const { id: jobId } = await Job.first()
+    try {
+      const { id: jobId } = await Job.first()
 
-    const user = await User.find(userId)
-    user.merge({ job_id: jobId })
-    await user.save()
+      const user = await User.find(userId)
+      user.merge({ job_id: jobId })
+      await user.save()
+    } catch (err) {
+      console.log('erro ao salvar job')
+    }
   }
 
   async store ({ request, response }) {
