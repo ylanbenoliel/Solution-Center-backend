@@ -42,6 +42,14 @@ class EventController {
   }
 
   /**
+   * @param {string} date
+   *
+   */
+  normalizeDateTimeToUtc (date) {
+    return subHours(parseISO(date), 3)
+  }
+
+  /**
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
@@ -103,7 +111,7 @@ class EventController {
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent }
           const dateTimeString = `${date} ${hour}`
-          const ISONoEventDate = subHours(parseISO(dateTimeString), 3)
+          const ISONoEventDate = this.normalizeDateTimeToUtc(dateTimeString)
 
           if (isPast(ISONoEventDate)) {
             const code = '4'
@@ -133,22 +141,20 @@ class EventController {
 
           const dateString = format(hasEvent.date, 'yyyy-MM-dd')
           const dateTimeString = `${dateString} ${hasEvent.time}`
-          const parsedDate = subHours(parseISO(dateTimeString), 3)
-          const diffTime = parsedDate - currentDate
-          // const dateTimeDistance = formatDistance(currentDate, parsedDate)
-          // const distArray = dateTimeDistance.split(' ')
-          // const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
-
-          const dateTimeDistanceIsHourAndBelowSix = diffTime <= 21600000
+          const parsedDate = this.normalizeDateTimeToUtc(dateTimeString)
 
           if (isPast(parsedDate)) {
             const code = '3'
             validEvents.push({ ...hasEvent, code })
             continue
           }
+
+          const diffTime = parsedDate - currentDate
+          const timeDistanceIsBelowSixHours = diffTime <= 21600000
+
           if (isSameDay(parsedDate, currentDate)) {
             let localCode = ''
-            if (dateTimeDistanceIsHourAndBelowSix) {
+            if (timeDistanceIsBelowSixHours) {
               localCode = '3'
             } else {
               localCode = '2'
@@ -158,7 +164,7 @@ class EventController {
           }
           if (isFuture(parsedDate)) {
             let localCode = ''
-            if (dateTimeDistanceIsHourAndBelowSix) {
+            if (timeDistanceIsBelowSixHours) {
               localCode = '3'
             } else {
               localCode = '2'
