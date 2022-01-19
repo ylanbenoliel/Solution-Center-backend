@@ -4,7 +4,6 @@ const {
   parseISO,
   isSaturday,
   format,
-  formatDistance,
   isSameDay,
   isFuture,
   isPast,
@@ -45,7 +44,7 @@ class EventController {
    * @param {string} date
    *
    */
-  normalizeDateTimeToUtc (date) {
+  normalizeDateTimeToISOString (date) {
     return subHours(parseISO(date), 3)
   }
 
@@ -111,7 +110,7 @@ class EventController {
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent }
           const dateTimeString = `${date} ${hour}`
-          const ISONoEventDate = this.normalizeDateTimeToUtc(dateTimeString)
+          const ISONoEventDate = this.normalizeDateTimeToISOString(dateTimeString)
 
           if (isPast(ISONoEventDate)) {
             const code = '4'
@@ -141,7 +140,7 @@ class EventController {
 
           const dateString = format(hasEvent.date, 'yyyy-MM-dd')
           const dateTimeString = `${dateString} ${hasEvent.time}`
-          const parsedDate = this.normalizeDateTimeToUtc(dateTimeString)
+          const parsedDate = this.normalizeDateTimeToISOString(dateTimeString)
 
           if (isPast(parsedDate)) {
             const code = '3'
@@ -323,15 +322,12 @@ class EventController {
 
       const dateString = format(date, 'yyyy-MM-dd')
       const dateTimeString = `${dateString} ${time}`
-      const parsedDate = subHours(parseISO(dateTimeString), 3)
-      const dateTimeDistance = formatDistance(currentDate, parsedDate)
-      const distArray = dateTimeDistance.split(' ')
-      const timeDistArray = distArray.length === 2 ? Number(distArray[0]) : Number(distArray[1])
-      const dateTimeDistanceIsHourAndBelowSix =
-      dateTimeDistance.includes('hour') && timeDistArray < 6
-      const dateTimeDistanceIsMinute = dateTimeDistance.includes('min')
+      const parsedDate = this.normalizeDateTimeToISOString(dateTimeString)
 
-      if (dateTimeDistanceIsMinute || dateTimeDistanceIsHourAndBelowSix) {
+      const diffTime = parsedDate - currentDate
+      const dateTimeDistanceIsHourAndBelowSix = diffTime <= 21600000
+
+      if (dateTimeDistanceIsHourAndBelowSix) {
         return response
           .status(400)
           .send({ message: 'Tempo de cancelamento da reserva expirado.' })
