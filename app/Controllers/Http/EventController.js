@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-'use strict'
+"use strict";
 const {
   parseISO,
   isSaturday,
@@ -7,21 +7,26 @@ const {
   isSameDay,
   isFuture,
   isPast,
-  subHours
+  subHours,
   // isSunday
-} = require('date-fns')
-const { timeToSaveInDatabase, parseDateFromHyphenToSlash, eventDateInPast, eventDateInFuture } = require('../../Helpers/functions')
+} = require("date-fns");
+const {
+  timeToSaveInDatabase,
+  parseDateFromHyphenToSlash,
+  eventDateInPast,
+  eventDateInFuture,
+} = require("../../Helpers/functions");
 
 const {
   HOURS_USER_BUSINESS_DAYS,
   HOURS_USER_SATURDAY,
-  ROOM_DATA
-} = require('../../Helpers/constants')
+  ROOM_DATA,
+} = require("../../Helpers/constants");
 
-const Database = use('Database')
-const Event = use('App/Models/Event')
-const User = use('App/Models/User')
-const Message = use('App/Models/Message')
+const Database = use("Database");
+const Event = use("App/Models/Event");
+const User = use("App/Models/User");
+const Message = use("App/Models/Message");
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -34,18 +39,11 @@ class EventController {
   roomName(roomId) {
     const ROOM_NAME = ROOM_DATA.find((room) => {
       if (room.id === Number(roomId)) {
-        return room.name
-      } return false
-    })
-    return ROOM_NAME.name.split(' ')[0]
-  }
-
-  /**
-   * @param {string} date
-   *
-   */
-  normalizeDateTimeToISOString(date) {
-    return subHours(parseISO(date), 3)
+        return room.name;
+      }
+      return false;
+    });
+    return ROOM_NAME.name.split(" ")[0];
   }
 
   /**
@@ -55,327 +53,326 @@ class EventController {
    */
   async schedule({ request, response, auth }) {
     try {
-      const { date, room } = request.post()
-      const userID = auth.user.id
+      const { date, room } = request.post();
+      const userID = auth.user.id;
       // const dayToVerify = parseISO(date)
 
       // if (isSunday(dayToVerify)) {
       //   return response.status(400).send({ message: 'Selecione algum dia disponível!' })
       // }
 
-      const { active } = await User.find(userID)
+      const { active } = await User.find(userID);
       if (!active) {
-        return response.status(200).send({ active })
+        return response.status(200).send({ active });
       }
 
-      let hoursInterval = []
-      const ISODate = parseISO(date)
+      let hoursInterval = [];
+      const ISODate = parseISO(date);
 
       if (isSaturday(ISODate)) {
-        hoursInterval = HOURS_USER_SATURDAY
+        hoursInterval = HOURS_USER_SATURDAY;
       } else {
-        hoursInterval = HOURS_USER_BUSINESS_DAYS
+        hoursInterval = HOURS_USER_BUSINESS_DAYS;
       }
 
-      const query = await Database
-        .select('events.id as event',
-          'users.id as user',
-          'users.name',
-          'events.room',
-          'events.date',
-          'events.time')
-        .from('events')
-        .innerJoin('users', 'users.id', 'events.user_id')
-        .where({ date, room })
+      const query = await Database.select(
+        "events.id as event",
+        "users.id as user",
+        "users.name",
+        "events.room",
+        "events.date",
+        "events.time"
+      )
+        .from("events")
+        .innerJoin("users", "users.id", "events.user_id")
+        .where({ date, room });
 
-      const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3)
-      const validEvents = []
+      const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3);
+      const validEvents = [];
       for (let i = 0; i < hoursInterval.length; i++) {
         // 1 - horário vago,
         // 2 - horário do usuário,
         // 3 - horário do usuário que não pode ser desmarcado,
         // 4 - horário indisponivel,
 
-        const hour = hoursInterval[i]
-        const hasEvent = query.find(event => event.time.includes(hour))
+        const hour = hoursInterval[i];
+        const hasEvent = query.find((event) => event.time.includes(hour));
 
         const hasNoEvent = {
           event: Math.random(),
-          user: '',
+          user: "",
           room: room,
           date: date,
-          time: `${hour}:00:00`
-        }
+          time: `${hour}:00:00`,
+        };
 
         if (!hasEvent) {
-          let noEvent = { ...hasNoEvent }
-          const dateTimeString = `${date} ${hour}`
-          const ISONoEventDate = this.normalizeDateTimeToISOString(dateTimeString)
+          let noEvent = { ...hasNoEvent };
+          const dateTimeString = `${date} ${hour}`;
+          const ISONoEventDate =
+            this.normalizeDateTimeToISOString(dateTimeString);
 
           if (isPast(ISONoEventDate)) {
-            const code = '4'
-            noEvent = { ...noEvent, code }
+            const code = "4";
+            noEvent = { ...noEvent, code };
           }
           if (isSameDay(ISONoEventDate, currentDate)) {
-            if ((ISONoEventDate.getHours() > currentDate.getHours())) {
-              const code = '1'
-              noEvent = { ...noEvent, code }
+            if (ISONoEventDate.getHours() > currentDate.getHours()) {
+              const code = "1";
+              noEvent = { ...noEvent, code };
             } else {
-              const code = '4'
-              noEvent = { ...noEvent, code }
+              const code = "4";
+              noEvent = { ...noEvent, code };
             }
           }
           if (isFuture(ISONoEventDate)) {
-            const code = '1'
-            noEvent = { ...noEvent, code }
+            const code = "1";
+            noEvent = { ...noEvent, code };
           }
 
-          validEvents.push(noEvent)
+          validEvents.push(noEvent);
         } else {
           if (Number(userID) !== Number(hasEvent.user)) {
-            const code = '4'
-            validEvents.push({ ...hasEvent, code })
-            continue
+            const code = "4";
+            validEvents.push({ ...hasEvent, code });
+            continue;
           }
 
-          const dateString = format(hasEvent.date, 'yyyy-MM-dd')
-          const dateTimeString = `${dateString} ${hasEvent.time}`
-          const parsedDate = this.normalizeDateTimeToISOString(dateTimeString)
+          const dateString = format(hasEvent.date, "yyyy-MM-dd");
+          const dateTimeString = `${dateString} ${hasEvent.time}`;
+          const parsedDate = subHours(new Date(dateTimeString), 3);
 
           if (eventDateInPast(currentDate, parsedDate)) {
-            const code = '3'
-            validEvents.push({ ...hasEvent, code })
-            continue
+            const code = "3";
+            validEvents.push({ ...hasEvent, code });
+            continue;
           }
 
-          const diffTime = parsedDate - currentDate
-          const timeDistanceIsBelowSixHours = diffTime <= 21600000
+          const diffTime = parsedDate - currentDate;
+          const timeDistanceIsBelowSixHours = diffTime <= 21600000;
 
           if (isSameDay(parsedDate, currentDate)) {
-            let localCode = ''
+            let localCode = "";
             if (timeDistanceIsBelowSixHours) {
-              localCode = '3'
+              localCode = "3";
             } else {
-              localCode = '2'
+              localCode = "2";
             }
             validEvents.push({
-              ...hasEvent, code: localCode, diffTime: diffTime,
-              event: parsedDate.toString(), current: currentDate.toString()
-            })
-            continue
+              ...hasEvent,
+              code: localCode,
+              diffTime: diffTime,
+              event: parsedDate,
+              current: currentDate,
+            });
+            continue;
           }
           if (eventDateInFuture(currentDate, parsedDate)) {
-            let localCode = ''
+            let localCode = "";
             if (timeDistanceIsBelowSixHours) {
-              localCode = '3'
+              localCode = "3";
             } else {
-              localCode = '2'
+              localCode = "2";
             }
-            validEvents.push({ ...hasEvent, code: localCode })
-            continue
+            validEvents.push({ ...hasEvent, code: localCode });
+            continue;
           }
         }
       }
 
       return response.status(200).send({
         hoursInterval,
-        validEvents
-      })
+        validEvents,
+      });
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Ocorreu um erro ao retornar os horários.' })
+        .send({ message: "Ocorreu um erro ao retornar os horários." });
     }
   }
 
   /**
- * @param {object} ctx
- * @param {Request} ctx.request
- * @param {Response} ctx.response
- */
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
   async store({ request, response, auth }) {
     try {
-      const { room, date, time } = request.post()
-      const userID = auth.user.id
+      const { room, date, time } = request.post();
+      const userID = auth.user.id;
 
-      const formattedTime = timeToSaveInDatabase(time)
+      const formattedTime = timeToSaveInDatabase(time);
 
-      const otherUserAlreadyOwnThisEvent = await Event
-        .query()
-        .select('id')
+      const otherUserAlreadyOwnThisEvent = await Event.query()
+        .select("id")
         .where({ room, date, time: formattedTime, user_id: !userID })
-        .fetch()
+        .fetch();
 
-      const hasEventInDesiredMoment = otherUserAlreadyOwnThisEvent.toJSON()[0]
+      const hasEventInDesiredMoment = otherUserAlreadyOwnThisEvent.toJSON()[0];
       if (hasEventInDesiredMoment) {
         return response
           .status(400)
-          .send({ message: 'Reserva de outro usuário, feche e tente novamente!' })
+          .send({
+            message: "Reserva de outro usuário, feche e tente novamente!",
+          });
       }
 
-      const userEventInSameDateTime = await Event
-        .query()
+      const userEventInSameDateTime = await Event.query()
         .where({
           user_id: userID,
           date: date,
-          time: formattedTime
+          time: formattedTime,
         })
-        .fetch()
+        .fetch();
       if (userEventInSameDateTime.rows.length !== 0) {
-        const eventJson = userEventInSameDateTime.toJSON()[0]
-        const localRoom = this.roomName(eventJson.room)
+        const eventJson = userEventInSameDateTime.toJSON()[0];
+        const localRoom = this.roomName(eventJson.room);
         return response
           .status(406)
-          .send({ message: `Você tem o mesmo horário na sala ${localRoom}.` })
+          .send({ message: `Você tem o mesmo horário na sala ${localRoom}.` });
       }
 
       const data = {
         user_id: userID,
         room,
         date,
-        time: formattedTime
-      }
-      const newEvent = await Event.create(data)
+        time: formattedTime,
+      };
+      const newEvent = await Event.create(data);
 
       const messageToSave =
         `Você reservou a Sala ${this.roomName(room)},` +
-        ` Data ${parseDateFromHyphenToSlash(date)}, Hora ${formattedTime}.`
-      await Message.create({ user_id: userID, message: messageToSave })
+        ` Data ${parseDateFromHyphenToSlash(date)}, Hora ${formattedTime}.`;
+      await Message.create({ user_id: userID, message: messageToSave });
 
       return response
         .status(200)
-        .send({ message: 'Horário salvo!', event: newEvent })
+        .send({ message: "Horário salvo!", event: newEvent });
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Ocorreu um erro ao salvar o horário' })
+        .send({ message: "Ocorreu um erro ao salvar o horário" });
     }
   }
 
   /**
- * @param {object} ctx
- * @param {Request} ctx.request
- * @param {Response} ctx.response
- */
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
   async show({ request, response, auth }) {
     try {
-      const userID = auth.user.id
-      const page = request.input('page', 1)
+      const userID = auth.user.id;
+      const page = request.input("page", 1);
       const event = await Event.query()
-        .select('id', 'user_id', 'room', 'date', 'time', 'status_payment')
+        .select("id", "user_id", "room", "date", "time", "status_payment")
         .where({
-          user_id: userID
+          user_id: userID,
         })
-        .orderBy('date', 'desc')
-        .paginate(page)
+        .orderBy("date", "desc")
+        .paginate(page);
 
-      return event
-    } catch (error) {
-      return response.status(error.status).send({ message: 'Erro ao buscar horários.' })
-    }
-  }
-
-  /**
- * @param {object} ctx
- * @param {Request} ctx.request
- * @param {Response} ctx.response
- */
-  async update({ response, request, auth }) {
-    try {
-      const userID = auth.user.id
-
-      const data = request.only([
-        'id',
-        'room',
-        'date',
-        'time'
-      ])
-
-      const event = await Event.findByOrFail('id', data.id)
-      const jsonEvent = event.toJSON()
-
-      if (!jsonEvent || jsonEvent.user_id != userID) {
-        return response.status(401)
-          .send({ message: 'Não está autorizado a deletar esse horário' })
-      }
-
-      event.merge(data)
-      await event.save()
-
-      return response
-        .status(200)
-        .send({ message: 'Horário atualizado!' })
+      return event;
     } catch (error) {
       return response
         .status(error.status)
-        .send({ message: 'Erro ao atualizar horário.' })
+        .send({ message: "Erro ao buscar horários." });
     }
   }
 
   /**
- * Delete a event with id.
- * DELETE events/:id
- *
- * @param {object} ctx
- * @param {Request} ctx.request
- * @param {Response} ctx.response
- */
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async update({ response, request, auth }) {
+    try {
+      const userID = auth.user.id;
+
+      const data = request.only(["id", "room", "date", "time"]);
+
+      const event = await Event.findByOrFail("id", data.id);
+      const jsonEvent = event.toJSON();
+
+      if (!jsonEvent || jsonEvent.user_id != userID) {
+        return response
+          .status(401)
+          .send({ message: "Não está autorizado a deletar esse horário" });
+      }
+
+      event.merge(data);
+      await event.save();
+
+      return response.status(200).send({ message: "Horário atualizado!" });
+    } catch (error) {
+      return response
+        .status(error.status)
+        .send({ message: "Erro ao atualizar horário." });
+    }
+  }
+
+  /**
+   * Delete a event with id.
+   * DELETE events/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
   async destroy({ params, response, auth }) {
     try {
-      const eventID = params.id
-      const userID = auth.user.id
+      const eventID = params.id;
+      const userID = auth.user.id;
 
-      const event = await Event.findOrFail(eventID)
+      const event = await Event.findOrFail(eventID);
 
       if (event.user_id !== Number(userID)) {
         return response
           .status(401)
-          .send({ message: 'Não está autorizado a deletar esse horário!' })
+          .send({ message: "Não está autorizado a deletar esse horário!" });
       }
-      const currentDate = subHours(new Date(), 3)
+      const currentDate = subHours(new Date(), 3);
 
-      const { room, date, time } = event
+      const { room, date, time } = event;
 
-      const dateString = format(date, 'yyyy-MM-dd')
-      const dateTimeString = `${dateString} ${time}`
-      const parsedDate = this.normalizeDateTimeToISOString(dateTimeString)
+      const dateString = format(date, "yyyy-MM-dd");
+      const dateTimeString = `${dateString} ${time}`;
+      const parsedDate = this.normalizeDateTimeToISOString(dateTimeString);
 
-      const diffTime = parsedDate - currentDate
-      const dateTimeDistanceIsHourAndBelowSix = diffTime <= 21600000
+      const diffTime = parsedDate - currentDate;
+      const dateTimeDistanceIsHourAndBelowSix = diffTime <= 21600000;
 
       if (dateTimeDistanceIsHourAndBelowSix) {
         return response
           .status(400)
-          .send({ message: 'Tempo de cancelamento da reserva expirado.' })
+          .send({ message: "Tempo de cancelamento da reserva expirado." });
       }
 
-      const formattedDate = format(date, 'dd/MM/yyyy')
+      const formattedDate = format(date, "dd/MM/yyyy");
       const messageToSave =
         `Você apagou a reserva da Sala ${this.roomName(room)},` +
-        ` Data ${formattedDate}, Hora ${time}.`
+        ` Data ${formattedDate}, Hora ${time}.`;
 
-      await Message.create({ user_id: userID, message: messageToSave })
+      await Message.create({ user_id: userID, message: messageToSave });
 
-      await Event
-        .query()
+      await Event.query()
         .where({
-          id: eventID
-        }).delete()
+          id: eventID,
+        })
+        .delete();
 
-      return response
-        .status(200)
-        .send({ message: 'Horário desmarcado.' })
+      return response.status(200).send({ message: "Horário desmarcado." });
     } catch (error) {
       if (Number(error.status) === 404) {
         return response
           .status(error.status)
-          .send({ message: 'Reserva não encontrada.' })
+          .send({ message: "Reserva não encontrada." });
       }
       return response
         .status(error.status)
-        .send({ message: 'Não foi possível desmarcar horário.' })
+        .send({ message: "Não foi possível desmarcar horário." });
     }
   }
 }
 
-module.exports = EventController
+module.exports = EventController;
