@@ -88,7 +88,7 @@ class EventController {
         .innerJoin('users', 'users.id', 'events.user_id')
         .where({ date, room })
 
-      const currentDate = subHours(new Date(), 3)
+      const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3)
       const validEvents = []
       for (let i = 0; i < hoursInterval.length; i++) {
       // 1 - horário vago,
@@ -144,7 +144,7 @@ class EventController {
 
           if (eventDateInPast(currentDate, parsedDate)) {
             const code = '3'
-            validEvents.push({ ...hasEvent, code, message: 'past' })
+            validEvents.push({ ...hasEvent, code })
             continue
           }
 
@@ -158,7 +158,7 @@ class EventController {
             } else {
               localCode = '2'
             }
-            validEvents.push({ ...hasEvent, code: localCode, diffTime, message: 'today' })
+            validEvents.push({ ...hasEvent, code: localCode, diffTime: diffTime })
             continue
           }
           if (eventDateInFuture(currentDate, parsedDate)) {
@@ -168,7 +168,7 @@ class EventController {
             } else {
               localCode = '2'
             }
-            validEvents.push({ ...hasEvent, code: localCode, diffTime, message: 'future' })
+            validEvents.push({ ...hasEvent, code: localCode })
             continue
           }
         }
