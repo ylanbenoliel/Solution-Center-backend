@@ -89,6 +89,7 @@ class EventController {
 
       const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3);
       const validEvents = [];
+      return currentDate
       for (let i = 0; i < hoursInterval.length; i++) {
         // 1 - horário vago,
         // 2 - horário do usuário,
