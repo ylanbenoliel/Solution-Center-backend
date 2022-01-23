@@ -58,9 +58,35 @@ async function prepareNotifications (message, userArray, title = 'Solution Cente
   return sendNotifications
 }
 
+/**
+ * @param {Date} currentDate
+ * @param {Date} eventDate
+ * @returns {boolean} boolean
+ */
+const eventDateInPast = function (currentDate, eventDate) {
+  if (eventDate.setHours(0, 0, 0, 0) < currentDate.setHours(0, 0, 0, 0)) {
+    return true
+  }
+  return false
+}
+
+/**
+ * @param {Date} currentDate
+ * @param {Date} eventDate
+ * @returns {boolean} boolean
+ */
+const eventDateInFuture = function (currentDate, eventDate) {
+  if (currentDate.setHours(0, 0, 0, 0) < eventDate.setHours(0, 0, 0, 0)) {
+    return true
+  }
+  return false
+}
+
 module.exports = {
   writeLog,
   timeToSaveInDatabase,
   parseDateFromHyphenToSlash,
-  prepareNotifications
+  prepareNotifications,
+  eventDateInPast,
+  eventDateInFuture
 }
