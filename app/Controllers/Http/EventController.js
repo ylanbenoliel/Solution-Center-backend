@@ -89,7 +89,7 @@ class EventController {
 
       const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3);
       const validEvents = [];
-     
+
       for (let i = 0; i < hoursInterval.length; i++) {
         // 1 - horário vago,
         // 2 - horário do usuário,
@@ -110,7 +110,7 @@ class EventController {
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent };
           const dateTimeString = `${date} ${hour}`;
-          const ISONoEventDate = subHours(new Date(dateTimeString),3)
+          const ISONoEventDate = subHours(new Date(dateTimeString), 3);
 
           if (eventDateInPast(currentDate, ISONoEventDate)) {
             const code = "4";
@@ -139,8 +139,17 @@ class EventController {
           }
 
           const dateString = format(hasEvent.date, "yyyy-MM-dd");
-          const dateTimeString = `${dateString} ${hasEvent.time}`;
-          const parsedDate = subHours(new Date(dateTimeString), 3);
+          const dateSpltted = dateString.split("-");
+          // const dateTimeString = `${dateString} ${hasEvent.time}`;
+          const parsedDate = subHours(
+            new Date(
+              dateSpltted[0],
+              dateSpltted[1],
+              dateSpltted[2],
+              Number(hour)
+            ),
+            3
+          );
 
           if (eventDateInPast(currentDate, parsedDate)) {
             const code = "3";
@@ -164,7 +173,6 @@ class EventController {
               diffTime: diffTime,
               event: parsedDate,
               current: currentDate,
-              timeString: dateTimeString
             });
             continue;
           }
@@ -211,11 +219,9 @@ class EventController {
 
       const hasEventInDesiredMoment = otherUserAlreadyOwnThisEvent.toJSON()[0];
       if (hasEventInDesiredMoment) {
-        return response
-          .status(400)
-          .send({
-            message: "Reserva de outro usuário, feche e tente novamente!",
-          });
+        return response.status(400).send({
+          message: "Reserva de outro usuário, feche e tente novamente!",
+        });
       }
 
       const userEventInSameDateTime = await Event.query()
