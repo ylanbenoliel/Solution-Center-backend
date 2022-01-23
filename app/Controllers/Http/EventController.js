@@ -57,11 +57,11 @@ class EventController {
     try {
       const { date, room } = request.post()
       const userID = auth.user.id
-      const dayToVerify = parseISO(date)
+      // const dayToVerify = parseISO(date)
 
-      if (isSunday(dayToVerify)) {
-        return response.status(400).send({ message: 'Selecione algum dia disponível!' })
-      }
+      // if (isSunday(dayToVerify)) {
+      //   return response.status(400).send({ message: 'Selecione algum dia disponível!' })
+      // }
 
       const { active } = await User.find(userID)
       if (!active) {
