@@ -31,7 +31,7 @@ const Message = use('App/Models/Message')
  * Resourceful controller for interacting with events
  */
 class EventController {
-  roomName (roomId) {
+  roomName(roomId) {
     const ROOM_NAME = ROOM_DATA.find((room) => {
       if (room.id === Number(roomId)) {
         return room.name
@@ -44,7 +44,7 @@ class EventController {
    * @param {string} date
    *
    */
-  normalizeDateTimeToISOString (date) {
+  normalizeDateTimeToISOString(date) {
     return subHours(parseISO(date), 3)
   }
 
@@ -53,7 +53,7 @@ class EventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async schedule ({ request, response, auth }) {
+  async schedule({ request, response, auth }) {
     try {
       const { date, room } = request.post()
       const userID = auth.user.id
@@ -91,10 +91,10 @@ class EventController {
       const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3)
       const validEvents = []
       for (let i = 0; i < hoursInterval.length; i++) {
-      // 1 - horário vago,
-      // 2 - horário do usuário,
-      // 3 - horário do usuário que não pode ser desmarcado,
-      // 4 - horário indisponivel,
+        // 1 - horário vago,
+        // 2 - horário do usuário,
+        // 3 - horário do usuário que não pode ser desmarcado,
+        // 4 - horário indisponivel,
 
         const hour = hoursInterval[i]
         const hasEvent = query.find(event => event.time.includes(hour))
@@ -158,7 +158,10 @@ class EventController {
             } else {
               localCode = '2'
             }
-            validEvents.push({ ...hasEvent, code: localCode, diffTime: diffTime })
+            validEvents.push({
+              ...hasEvent, code: localCode, diffTime: diffTime,
+              event: parsedDate.toString(), current: currentDate.toString()
+            })
             continue
           }
           if (eventDateInFuture(currentDate, parsedDate)) {
@@ -190,7 +193,7 @@ class EventController {
  * @param {Request} ctx.request
  * @param {Response} ctx.response
  */
-  async store ({ request, response, auth }) {
+  async store({ request, response, auth }) {
     try {
       const { room, date, time } = request.post()
       const userID = auth.user.id
@@ -235,8 +238,8 @@ class EventController {
       const newEvent = await Event.create(data)
 
       const messageToSave =
-      `Você reservou a Sala ${this.roomName(room)},` +
-      ` Data ${parseDateFromHyphenToSlash(date)}, Hora ${formattedTime}.`
+        `Você reservou a Sala ${this.roomName(room)},` +
+        ` Data ${parseDateFromHyphenToSlash(date)}, Hora ${formattedTime}.`
       await Message.create({ user_id: userID, message: messageToSave })
 
       return response
@@ -254,7 +257,7 @@ class EventController {
  * @param {Request} ctx.request
  * @param {Response} ctx.response
  */
-  async show ({ request, response, auth }) {
+  async show({ request, response, auth }) {
     try {
       const userID = auth.user.id
       const page = request.input('page', 1)
@@ -277,7 +280,7 @@ class EventController {
  * @param {Request} ctx.request
  * @param {Response} ctx.response
  */
-  async update ({ response, request, auth }) {
+  async update({ response, request, auth }) {
     try {
       const userID = auth.user.id
 
@@ -317,7 +320,7 @@ class EventController {
  * @param {Request} ctx.request
  * @param {Response} ctx.response
  */
-  async destroy ({ params, response, auth }) {
+  async destroy({ params, response, auth }) {
     try {
       const eventID = params.id
       const userID = auth.user.id
@@ -348,8 +351,8 @@ class EventController {
 
       const formattedDate = format(date, 'dd/MM/yyyy')
       const messageToSave =
-      `Você apagou a reserva da Sala ${this.roomName(room)},` +
-      ` Data ${formattedDate}, Hora ${time}.`
+        `Você apagou a reserva da Sala ${this.roomName(room)},` +
+        ` Data ${formattedDate}, Hora ${time}.`
 
       await Message.create({ user_id: userID, message: messageToSave })
 
