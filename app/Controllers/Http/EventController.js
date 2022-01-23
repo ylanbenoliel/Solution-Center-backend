@@ -144,7 +144,7 @@ class EventController {
 
           if (isPast(parsedDate)) {
             const code = '3'
-            validEvents.push({ ...hasEvent, code })
+            validEvents.push({ ...hasEvent, code, parsedDate })
             continue
           }
 
@@ -158,7 +158,7 @@ class EventController {
             } else {
               localCode = '2'
             }
-            validEvents.push({ ...hasEvent, code: localCode })
+            validEvents.push({ ...hasEvent, code: localCode, parsedDate, diffTime })
             continue
           }
           if (isFuture(parsedDate)) {
@@ -168,7 +168,7 @@ class EventController {
             } else {
               localCode = '2'
             }
-            validEvents.push({ ...hasEvent, code: localCode })
+            validEvents.push({ ...hasEvent, code: localCode, parsedDate, diffTime })
             continue
           }
         }
