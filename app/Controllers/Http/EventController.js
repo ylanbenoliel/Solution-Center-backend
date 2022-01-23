@@ -140,7 +140,7 @@ class EventController {
 
           const dateString = format(hasEvent.date, "yyyy-MM-dd");
           const dateTimeString = `${dateString} ${hasEvent.time}`;
-          const parsedDate = subHours(new Date(), 3);
+          const parsedDate = subHours(new Date(dateTimeString), 3);
 
           if (eventDateInPast(currentDate, parsedDate)) {
             const code = "3";
