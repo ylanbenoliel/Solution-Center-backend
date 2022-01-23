@@ -109,8 +109,8 @@ class EventController {
 
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent };
-          const dateTimeString = `${date} ${hour}`;
-          const ISONoEventDate = subHours(new Date(dateTimeString), 3);
+          const dateSpltted = date.split("-");
+          const ISONoEventDate = subHours(new Date(dateSpltted[0],dateSpltted[1],dateSpltted[2], Number(hour)), 3);
 
           if (eventDateInPast(currentDate, ISONoEventDate)) {
             const code = "4";
