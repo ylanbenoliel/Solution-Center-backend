@@ -89,7 +89,7 @@ class EventController {
 
       const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3);
       const validEvents = [];
-      return currentDate
+     
       for (let i = 0; i < hoursInterval.length; i++) {
         // 1 - horário vago,
         // 2 - horário do usuário,
@@ -110,10 +110,9 @@ class EventController {
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent };
           const dateTimeString = `${date} ${hour}`;
-          const ISONoEventDate =
-            this.normalizeDateTimeToISOString(dateTimeString);
+          const ISONoEventDate = subHours(new Date(dateTimeString),3)
 
-          if (isPast(ISONoEventDate)) {
+          if (eventDateInPast(currentDate, ISONoEventDate)) {
             const code = "4";
             noEvent = { ...noEvent, code };
           }
@@ -126,7 +125,7 @@ class EventController {
               noEvent = { ...noEvent, code };
             }
           }
-          if (isFuture(ISONoEventDate)) {
+          if (eventDateInFuture(currentDate, ISONoEventDate)) {
             const code = "1";
             noEvent = { ...noEvent, code };
           }
