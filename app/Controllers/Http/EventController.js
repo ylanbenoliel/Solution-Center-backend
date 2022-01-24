@@ -110,10 +110,13 @@ class EventController {
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent };
           const dateSplitted = date.split("-");
+
+          const month = Number(dateSplitted[1])-1;
+
           const ISONoEventDate = subHours(
             new Date(
-              dateSplitted[0],
-              dateSplitted[1],
+              Number(dateSplitted[0]),
+              month,
               dateSplitted[2],
               Number(hour)
             ),
