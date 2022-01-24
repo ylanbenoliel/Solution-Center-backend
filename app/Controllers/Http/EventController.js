@@ -87,7 +87,7 @@ class EventController {
         .innerJoin("users", "users.id", "events.user_id")
         .where({ date, room });
 
-      const currentDate = subHours(new Date(2022, 0, 23, 10, 0), 3);
+      const currentDate = subHours(new Date(2022, 0, 23, 11, 0), 3);
       const validEvents = [];
 
       for (let i = 0; i < hoursInterval.length; i++) {
@@ -109,10 +109,18 @@ class EventController {
 
         if (!hasEvent) {
           let noEvent = { ...hasNoEvent };
-          const dateSpltted = date.split("-");
-          const ISONoEventDate = subHours(new Date(dateSpltted[0],dateSpltted[1],dateSpltted[2], Number(hour)), 3);
+          const dateSplitted = date.split("-");
+          const ISONoEventDate = subHours(
+            new Date(
+              dateSplitted[0],
+              dateSplitted[1],
+              dateSplitted[2],
+              Number(hour)
+            ),
+            3
+          );
 
-          if (eventDateInPast(currentDate, ISONoEventDate)) {
+          if (isPast(ISONoEventDate)) {
             const code = "4";
             noEvent = { ...noEvent, code };
           }
@@ -125,7 +133,7 @@ class EventController {
               noEvent = { ...noEvent, code };
             }
           }
-          if (eventDateInFuture(currentDate, ISONoEventDate)) {
+          if (isFuture(ISONoEventDate)) {
             const code = "1";
             noEvent = { ...noEvent, code };
           }
