@@ -126,6 +126,8 @@ class EventController {
           if (isPast(ISONoEventDate)) {
             const code = "4";
             noEvent = { ...noEvent, code, message: "past" };
+            validEvents.push(noEvent);
+            continue;
           }
           if (isSameDay(ISONoEventDate, currentDate)) {
             if (ISONoEventDate.getHours() > currentDate.getHours()) {
@@ -135,17 +137,15 @@ class EventController {
               const code = "4";
               noEvent = { ...noEvent, code };
             }
+            validEvents.push(noEvent);
+            continue;
           }
           if (isFuture(ISONoEventDate)) {
             const code = "1";
             noEvent = { ...noEvent, code, message: "future" };
+            validEvents.push(noEvent);
+            continue;
           }
-          noEvent = {
-            ...noEvent,
-            current: currentDate,
-            noEvent: ISONoEventDate,
-          };
-          validEvents.push(noEvent);
         } else {
           if (Number(userID) !== Number(hasEvent.user)) {
             const code = "4";
@@ -167,13 +167,13 @@ class EventController {
             3
           );
 
-          if (eventDateInPast(currentDate, parsedDate)) {
+          if (isPast(parsedDate)) {
             const code = "3";
             validEvents.push({ ...hasEvent, code, message: "past" });
             continue;
           }
 
-          const diffTime = parsedDate - currentDate;
+          const diffTime = parsedDate.getTime() - currentDate.getTime();
           const timeDistanceIsBelowSixHours = diffTime <= 21600000;
 
           if (isSameDay(parsedDate, currentDate)) {
@@ -191,7 +191,7 @@ class EventController {
             });
             continue;
           }
-          if (eventDateInFuture(currentDate, parsedDate)) {
+          if (isFuture(parsedDate)) {
             let localCode = "";
             if (timeDistanceIsBelowSixHours) {
               localCode = "3";
