@@ -87,7 +87,6 @@ class EventController {
         .innerJoin("users", "users.id", "events.user_id")
         .where({ date, room });
 
-      const currentDate = subHours(new Date(2022, 0, 23, 11, 0), 3);
       const validEvents = [];
 
       for (let i = 0; i < hoursInterval.length; i++) {
@@ -95,6 +94,7 @@ class EventController {
         // 2 - horário do usuário,
         // 3 - horário do usuário que não pode ser desmarcado,
         // 4 - horário indisponivel,
+        const currentDate = subHours(new Date(2022, 0, 23, 11, 0), 3);
 
         const hour = hoursInterval[i];
         const hasEvent = query.find((event) => event.time.includes(hour));
@@ -122,7 +122,7 @@ class EventController {
 
           if (isPast(ISONoEventDate)) {
             const code = "4";
-            noEvent = { ...noEvent, code };
+            noEvent = { ...noEvent, code, message: "past" };
           }
           if (isSameDay(ISONoEventDate, currentDate)) {
             if (ISONoEventDate.getHours() > currentDate.getHours()) {
@@ -135,9 +135,13 @@ class EventController {
           }
           if (isFuture(ISONoEventDate)) {
             const code = "1";
-            noEvent = { ...noEvent, code };
+            noEvent = { ...noEvent, code, message: "future" };
           }
-
+          noEvent = {
+            ...noEvent,
+            current: currentDate,
+            noEvent: ISONoEventDate,
+          };
           validEvents.push(noEvent);
         } else {
           if (Number(userID) !== Number(hasEvent.user)) {
@@ -161,7 +165,7 @@ class EventController {
 
           if (eventDateInPast(currentDate, parsedDate)) {
             const code = "3";
-            validEvents.push({ ...hasEvent, code });
+            validEvents.push({ ...hasEvent, code, message: "past" });
             continue;
           }
 
@@ -179,8 +183,9 @@ class EventController {
               ...hasEvent,
               code: localCode,
               diffTime: diffTime,
-              event: parsedDate,
+              date: parsedDate,
               current: currentDate,
+              message: "day",
             });
             continue;
           }
@@ -191,7 +196,11 @@ class EventController {
             } else {
               localCode = "2";
             }
-            validEvents.push({ ...hasEvent, code: localCode });
+            validEvents.push({
+              ...hasEvent,
+              code: localCode,
+              message: "future",
+            });
             continue;
           }
         }
