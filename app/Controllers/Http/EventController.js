@@ -111,13 +111,13 @@ class EventController {
           let noEvent = { ...hasNoEvent };
           const dateSplitted = date.split("-");
 
-          const month = Number(dateSplitted[1])-1;
+          const month = Number(dateSplitted[1]) - 1;
 
           const ISONoEventDate = subHours(
             new Date(
               Number(dateSplitted[0]),
               month,
-              dateSplitted[2],
+              Number(dateSplitted[2]),
               Number(hour)
             ),
             3
@@ -154,13 +154,14 @@ class EventController {
           }
 
           const dateString = format(hasEvent.date, "yyyy-MM-dd");
-          const dateSpltted = dateString.split("-");
+          const dateSplitted = dateString.split("-");
           // const dateTimeString = `${dateString} ${hasEvent.time}`;
+          const month = Number(dateSplitted[1]) - 1;
           const parsedDate = subHours(
             new Date(
-              dateSpltted[0],
-              dateSpltted[1],
-              dateSpltted[2],
+              Number(dateSplitted[0]),
+              month,
+              Number(dateSplitted[2]),
               Number(hour)
             ),
             3
@@ -186,8 +187,6 @@ class EventController {
               ...hasEvent,
               code: localCode,
               diffTime: diffTime,
-              date: parsedDate,
-              current: currentDate,
               message: "day",
             });
             continue;
