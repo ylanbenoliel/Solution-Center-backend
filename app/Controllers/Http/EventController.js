@@ -117,7 +117,7 @@ class EventController {
             noEvent = { ...noEvent, code }
           }
           if (isSameDay(ISONoEventDate, currentDate)) {
-            if ((ISONoEventDate.getHours() > currentDate.getHours())) {
+            if ((ISONoEventDate.getTime() > currentDate.getTime())) {
               const code = '1'
               noEvent = { ...noEvent, code }
             } else {
