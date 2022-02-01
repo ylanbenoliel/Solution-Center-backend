@@ -163,11 +163,7 @@ class EventController {
           }
           if (isFuture(parsedDate)) {
             let localCode = ''
-            if (timeDistanceIsBelowSixHours) {
-              localCode = '3'
-            } else {
-              localCode = '2'
-            }
+            localCode = '2'
             validEvents.push({ ...hasEvent, code: localCode })
             continue
           }
