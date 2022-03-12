@@ -1,15 +1,15 @@
 {
-  "avulso": 40,
+  "avulso": 45,
   "turno": {
-    "valor": 210,
-    "adicional": 35
+    "valor": 240,
+    "adicional": 40
   },
   "diaria": {
-    "valor": 300,
-    "adicional": 35
+    "valor": 350,
+    "adicional": 40
   },
   "mensal": {
     "valor":2500,
-    "hora":35
+    "hora":40
   }
 }
