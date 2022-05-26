@@ -65,7 +65,7 @@ class EventController {
 
       const { active } = await User.find(userID)
       if (!active) {
-        return response.status(200).send({ active })
+        // return response.status(200).send({ active })
       }
 
       let hoursInterval = []
